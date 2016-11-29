@@ -4,6 +4,7 @@
 #include "G4Event.hh"
 #include "G4UserSteppingAction.hh"
 #include "G4ThreeVector.hh"
+#include "G4OpBoundaryProcess.hh"
 
 class G4HCofThisEvent;
 class G4Event;
@@ -12,7 +13,7 @@ class WCSimSteppingAction : public G4UserSteppingAction
 {
 
 public:
-  WCSimSteppingAction()
+  WCSimSteppingAction() : fExpectedNextStatus(Undefined)
   {};
 
   ~WCSimSteppingAction()
@@ -35,6 +36,7 @@ public:
 private:
 
   G4double ret[2];
+  G4OpBoundaryProcessStatus fExpectedNextStatus;
 
 };
 

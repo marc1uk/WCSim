@@ -180,14 +180,43 @@ void WCSimDetectorConstruction::DefineANNIEdimensions(){
 	
   // Define Mylar cladding
   // =====================
-  scintSurface_op = new G4OpticalSurface("mylarSurface",glisur, polished, dielectric_metal);	//ground
+  // For the optical boundary process to use a border surface, the two volumes must have been positioned with G4PVPlacement. 
+  scintSurface_op = new G4OpticalSurface("mylarSurface",unified, polishedbackpainted, dielectric_dielectric);
+
+/*
+  scintSurface_op = new G4OpticalSurface("mylarSurface"
+  scintSurface_op->SetType(dielectric_LUT);
+  scintSurface_op->SetModel(LUT);
+  scintSurface_op->SetFinish(polishedvm2000air);
+*/
   const G4int mylarmptentries = 2;
-  G4double mylar_Energy[mylarmptentries] = {2.0*eV, 3.6*eV};
-  G4double mylar_REFL[mylarmptentries] = {0.9,0.9};
-  G4double mylar_EFFI[mylarmptentries] = {0.0, 0.0};
+//  G4double mylar_Energy[mylarmptentries] = {2.0*eV, 3.6*eV};
+//  G4double mylar_reflectivity[mylarmptentries] = {0.9,0.9};
+//  G4double mylar_efficiency[mylarmptentries] = {0.0, 0.0};
+
+// from http://geant4.web.cern.ch/geant4/UserDocumentation/UsersGuides/ForApplicationDeveloper/html/ch05s02.html
+	G4double mylar_Energy[mylarmptentries] = {2.038*eV, 4.144*eV};
+	G4double mylar_rindex[mylarmptentries] = {1.0, 1.0};
+	G4double mylar_specularlobe[mylarmptentries] = {0.1, 0.1};
+	G4double mylar_specularspike[mylarmptentries] = {0.8, 0.8};
+	G4double mylar_backscatter[mylarmptentries] = {0.01, 0.01};
+	G4double mylar_reflectivity[mylarmptentries] = {0.9, 0.9};
+	//G4double mylar_efficiency[mylarmptentries] = {0.8, 0.1};
+
   G4MaterialPropertiesTable* MPTmylarSurface = new G4MaterialPropertiesTable();
-  MPTmylarSurface->AddProperty("REFLECTIVITY",mylar_Energy,mylar_REFL,mylarmptentries);
-  MPTmylarSurface->AddProperty("EFFICIENCY",mylar_Energy,mylar_EFFI,mylarmptentries);
+  MPTmylarSurface->AddProperty("REFLECTIVITY",mylar_Energy,mylar_reflectivity,mylarmptentries);
+  //MPTmylarSurface->AddProperty("EFFICIENCY",mylar_Energy,mylar_efficiency,mylarmptentries);
+  // i think this actually relates to the airgap implied by 'polishedbackpainted'
+	MPTmylarSurface -> AddProperty("RINDEX",mylar_Energy,mylar_rindex,mylarmptentries);
+	// and these relate to the degree of roughness of the finish of the scintillator paddle, not the mylar
+	MPTmylarSurface -> AddProperty("SPECULARLOBECONSTANT",mylar_Energy,mylar_specularlobe,mylarmptentries);
+	MPTmylarSurface -> AddProperty("SPECULARSPIKECONSTANT",mylar_Energy,mylar_specularspike,mylarmptentries);
+	MPTmylarSurface -> AddProperty("BACKSCATTERCONSTANT",mylar_Energy,mylar_backscatter,mylarmptentries);
+	// the mylar itself is assumed perfectly mirrored - specular spike constant 1, everything else 0
+
+	G4double sigma_alpha = 0.1;
+	scintSurface_op -> SetSigmaAlpha(sigma_alpha);	// defines roughness granularity of paddle...
+
   scintSurface_op->SetMaterialPropertiesTable(MPTmylarSurface);
   
   // Define efficiency for reflection & detection between paddles and PMTs at their ends
@@ -325,27 +354,30 @@ void WCSimDetectorConstruction::ConstructMRD(G4LogicalVolume* expHall_log, G4VPh
 void WCSimDetectorConstruction::PlaceMylarOnMRDPaddles(G4VPhysicalVolume* expHall_phys, G4VPhysicalVolume* totMRD_phys){
   // Place cladding on MRD paddles
   for(G4int i=0;i<((numpaddlesperpanelv+numpaddlesperpanelh)*(numpanels/2));i++){
-  		G4LogicalBorderSurface* scintSurface_log
-  		 = new G4LogicalBorderSurface("scintcladdinglog",paddles_phys.at(i),expHall_phys,scintSurface_op);
-  		 scintSurface_log
-  		 = new G4LogicalBorderSurface("scintcladdinglog",tapers_phys.at(i),expHall_phys,scintSurface_op);
-  		 
+  		G4LogicalBorderSurface* scintSurface_log;
   		 if(totMRD_phys){
   	   scintSurface_log
   		 = new G4LogicalBorderSurface("scintcladdinglog",paddles_phys.at(i),totMRD_phys,scintSurface_op);
   		 scintSurface_log
   		 = new G4LogicalBorderSurface("scintcladdinglog",tapers_phys.at(i),totMRD_phys,scintSurface_op);
-  		 }
+  		 }// else {
+  		scintSurface_log
+  		 = new G4LogicalBorderSurface("scintcladdinglog",paddles_phys.at(i),expHall_phys,scintSurface_op);
+  		 scintSurface_log
+  		 = new G4LogicalBorderSurface("scintcladdinglog",tapers_phys.at(i),expHall_phys,scintSurface_op);
+  		 //}
   }
   
 	// Place cladding on Light guides
   for(G4int i=0;i<((numpaddlesperpanelv+numpaddlesperpanelh)*(numpanels/2));i++){
-  		G4LogicalBorderSurface* scintSurface_log
-  		 = new G4LogicalBorderSurface("scintcladdinglog",lgs_phys.at(i),expHall_phys,scintSurface_op);
+  		G4LogicalBorderSurface* scintSurface_log;
   		 if(totMRD_phys){
   		 scintSurface_log
   		 = new G4LogicalBorderSurface("scintcladdinglog",lgs_phys.at(i),totMRD_phys,scintSurface_op);
-  		 }
+  		 }// else {
+  		 scintSurface_log
+  		 = new G4LogicalBorderSurface("scintcladdinglog",lgs_phys.at(i),expHall_phys,scintSurface_op);
+  		 //}
   }
 }
 
@@ -353,7 +385,8 @@ void WCSimDetectorConstruction::PlaceMylarOnMRDPaddles(G4VPhysicalVolume* expHal
 void WCSimDetectorConstruction::PlaceMylarOnFACCPaddles(G4VPhysicalVolume* expHall_phys, G4VPhysicalVolume* totVeto_phys){
   // Place cladding on Veto paddles
   for(G4int i=0;i<(numvetopaddles);i++){
-  		G4LogicalBorderSurface* vetoSurface_log
+  		G4LogicalBorderSurface* vetoSurface_log;
+  		vetoSurface_log
   		 = new G4LogicalBorderSurface("vetocladdinglog",vetopaddles_phys.at(i),expHall_phys,scintSurface_op);
   		 vetoSurface_log
   		 = new G4LogicalBorderSurface("vetocladdinglog",vetopaddles_phys.at(i),totVeto_phys,scintSurface_op);
@@ -361,7 +394,8 @@ void WCSimDetectorConstruction::PlaceMylarOnFACCPaddles(G4VPhysicalVolume* expHa
   
   // Place cladding on Veto Light guides
   for(G4int i=0;i<(numvetopaddles);i++){
-  		G4LogicalBorderSurface* vetoSurface_log
+  		G4LogicalBorderSurface* vetoSurface_log;
+  		vetoSurface_log
   		 = new G4LogicalBorderSurface("vetocladdinglog",vetolgs_phys.at(i),expHall_phys,scintSurface_op);
   		 vetoSurface_log
   		 = new G4LogicalBorderSurface("vetocladdinglog",vetolgs_phys.at(i),totVeto_phys,scintSurface_op);

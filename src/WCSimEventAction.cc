@@ -479,17 +479,17 @@ void WCSimEventAction::EndOfEventAction(const G4Event* evt)
 
   // Draw Charged Tracks 
   
+  G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
+  if(pVVisManager){
+    for (G4int i=0; i < n_trajectories; i++) {
+      WCSimTrajectory* trj = (WCSimTrajectory*)((*(evt->GetTrajectoryContainer()))[i]);
+      if (trj->GetCharge() != 0.){
+         trj->DrawTrajectory(50);
+      }
+    }
+  }
 
-  for (G4int i=0; i < n_trajectories; i++) 
-    {
-      WCSimTrajectory* trj = 
-	(WCSimTrajectory*)((*(evt->GetTrajectoryContainer()))[i]);
-
-      if (trj->GetCharge() != 0.)
- 	trj->DrawTrajectory(50);
-    } 
-
-   G4cout << G4endl << " Filling Root Event " << G4endl;
+   G4cout << G4endl << " Filling Root Event " << event_id<<G4endl;
 
    //   G4cout << "event_id: " << &event_id << G4endl;
    // G4cout << "jhfNtuple: " << &jhfNtuple << G4endl;
@@ -526,7 +526,9 @@ G4cout<<"Filling FACC Root Event"<<G4endl;
 		"facc");
   
   TTree* tree = GetRunAction()->GetTree();
-  tree->SetEntries(GetRunAction()->GetNumberOfEventsGenerated());
+  TBranch* tankeventbranch = tree->GetBranch("wcsimrootevent");
+  //tree->SetEntries(GetRunAction()->GetNumberOfEventsGenerated());
+  tree->SetEntries(tankeventbranch->GetEntries());
   TFile* hfile = tree->GetCurrentFile();
   // MF : overwrite the trees -- otherwise we have as many copies of the tree
   // as we have events. All the intermediate copies are incomplete, only the
@@ -534,6 +536,36 @@ G4cout<<"Filling FACC Root Event"<<G4endl;
   hfile->Write("",TObject::kOverwrite);
   
   G4cout<<"############# WCSIM FINISH END OF EVENT ACTION  ################"<<G4endl;
+  
+   
+   std::vector<int> bouncecount;
+   std::vector<int>* bouncecountp=&bouncecount;
+   std::vector<int> tracklength;
+   std::vector<int>* tracklengthp=&tracklength;
+   int acounter=0;
+   if (trajectoryContainer){
+     G4cout<<"we have "<<trajectoryContainer->entries()<<" trajectories"<<G4endl;
+     for (int i=0; i <trajectoryContainer->entries(); i++) {
+       WCSimTrajectory* trj = (WCSimTrajectory*)(*trajectoryContainer)[i];
+       if(trj->GetPDGEncoding()!=100){continue;}
+       bouncecount.push_back(trj->GetNumReflections());
+       tracklength.push_back(trj->GetTrackLength());
+       acounter++;
+       if(acounter<10){ G4cout<<"setting reflections of trajectory "<<acounter
+        <<" to "<<trj->GetNumReflections()<<" and track length to "<<trj->GetTrackLength()<<G4endl;}
+     }
+   }
+   G4cout<<"filling tree with "<<acounter<<" photons, with "<<bouncecount.size()<<" bounce counts and "
+       <<tracklength.size()<<" track lengths"<<G4endl;
+   TTree* phottree = GetRunAction()->GetPhotonTree();
+   phottree->SetBranchAddress("photevt",&event_id);
+   phottree->SetBranchAddress("photonbounces",&bouncecountp);
+   phottree->SetBranchAddress("tracklength",&tracklengthp);
+   phottree->Fill();
+   TFile* pfile = phottree->GetCurrentFile();
+   pfile->Write("",TObject::kOverwrite);
+   phottree->ResetBranchAddresses();
+   
 
 }
 //TODO: Starting and Stopping Volume finders also need to be modified to add MRD and FACC volumes
@@ -583,7 +615,7 @@ G4int WCSimEventAction::WCSimEventFindStartingVolume(G4ThreeVector vtx)
     vtxvol = 40;
   
   if(vtxvol<0){
-    G4cout<<"############# unkown vertex volume: "<<vtxVolumeName<<" ################"<<G4endl;
+    //G4cout<<"############# unkown vertex volume: "<<vtxVolumeName<<" ################"<<G4endl;
   }
   return vtxvol;
 }
@@ -632,7 +664,7 @@ G4int WCSimEventAction::WCSimEventFindStoppingVolume(G4String stopVolumeName)
     stopvol = 40;
 
   if(stopvol<0){
-    G4cout<<"############# unkown vertex volume: "<<stopVolumeName<<" ################"<<G4endl;
+    //G4cout<<"############# unkown vertex volume: "<<stopVolumeName<<" ################"<<G4endl;
   }
   return stopvol;
 }
@@ -717,7 +749,7 @@ void WCSimEventAction::FillRootEvent(G4int event_id,
       pdir[l]=jhfNtuple.pdir[k][l];
       stop[l]=jhfNtuple.stop[k][l];
       start[l]=jhfNtuple.start[k][l];
-	G4cout<< "start[" << k << "][" << l <<"]: "<< jhfNtuple.start[k][l] <<G4endl;
+	//G4cout<< "start[" << k << "][" << l <<"]: "<< jhfNtuple.start[k][l] <<G4endl;
     }
 
     // Add the track to the TClonesArray
@@ -836,7 +868,7 @@ void WCSimEventAction::FillRootEvent(G4int event_id,
 	pdir[l]=mom[l];        // momentum-vector 
 	stop[l]=Stop[l]/CLHEP::cm; // stopping point 
 	start[l]=Start[l]/CLHEP::cm; // starting point 
-	G4cout<<"part 2 start["<<l<<"]: "<< start[l] <<G4endl;
+	//G4cout<<"part 2 start["<<l<<"]: "<< start[l] <<G4endl;
       }
 
       // Add the track to the TClonesArray, watching out for times

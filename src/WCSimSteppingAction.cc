@@ -13,8 +13,8 @@
 #include "G4PVReplica.hh"
 #include "G4SDManager.hh"
 #include "G4RunManager.hh"
-
 #include "WCSimTrackInformation.hh"
+#include "G4OpBoundaryProcess.hh"
 
 
 void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
@@ -41,6 +41,66 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
 //    G4cout << " PROBLEM! " << theTrack->GetCreatorProcess()->GetProcessName() <<
 //  std::flush << G4endl;
 //  }
+
+  static G4ThreadLocal G4OpBoundaryProcess* boundary=NULL;
+  //find the boundary process only once
+  if(!boundary){
+    G4ProcessManager* pm = aStep->GetTrack()->GetDefinition()->GetProcessManager();
+    G4int nprocesses = pm->GetProcessListLength();
+    G4ProcessVector* pv = pm->GetProcessList();
+    G4int i;
+    for( i=0;i<nprocesses;i++){
+      if((*pv)[i]->GetProcessName()=="OpBoundary"){
+        boundary = (G4OpBoundaryProcess*)(*pv)[i];
+        break;
+      }
+    }
+  }
+  
+  G4VPhysicalVolume* thePostPV = aStep->GetPostStepPoint()->GetPhysicalVolume();
+  G4Track* track = aStep->GetTrack();
+  if ( track->GetCurrentStepNumber() == 1 ) fExpectedNextStatus = Undefined;
+  if(!thePostPV){//out of world
+    fExpectedNextStatus=Undefined;
+    return;
+  }
+  
+  if(track->GetDefinition()==G4OpticalPhoton::OpticalPhotonDefinition()&&
+     aStep->GetPostStepPoint()->GetStepStatus()==fGeomBoundary){
+     G4OpBoundaryProcessStatus boundaryStatus=boundary->GetStatus();
+     if(fExpectedNextStatus==StepTooSmall){
+        if(boundaryStatus!=StepTooSmall){
+          G4cout<<"error: poststeppoint volume is "
+                <<aStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()
+                <<" prestep point is "
+                <<aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName()
+                <<G4endl;
+          /*G4ExceptionDescription ed;
+          ed << "WCSimSteppingAction::UserSteppingAction(): "
+                << "No reallocation step after reflection!"
+                << G4endl;
+          G4Exception("WCSimSteppingAction::UserSteppingAction()", "WCSimExpl01",
+          FatalException,ed,
+          "Something is wrong with the surface normal or geometry");*/
+          track->SetTrackStatus(fStopAndKill);
+        }
+      }
+      fExpectedNextStatus=Undefined;
+      switch(boundaryStatus){
+      case FresnelReflection:
+      case TotalInternalReflection:
+      case LambertianReflection:
+      case LobeReflection:
+      case SpikeReflection:
+      case BackScattering:
+        {WCSimTrackInformation* aninfo = (WCSimTrackInformation*)track->GetUserInformation();
+        aninfo->IncrementNumReflections();
+        fExpectedNextStatus=StepTooSmall;
+        break;}
+      default:
+        break;
+      }
+  }
   
 }
 

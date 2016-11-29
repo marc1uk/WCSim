@@ -2,6 +2,7 @@
 
 #include "G4TrajectoryPoint.hh"
 #include "G4ParticleTable.hh"
+#include "G4ParticleTypes.hh"
 #include "G4AttDefStore.hh"
 #include "G4AttDef.hh"
 #include "G4AttValue.hh"
@@ -17,15 +18,16 @@ WCSimTrajectory::WCSimTrajectory()
   :  positionRecord(0), fTrackID(0), fParentID(0),
      PDGEncoding( 0 ), PDGCharge(0.0), ParticleName(""),
      initialMomentum( G4ThreeVector() ),SaveIt(false),creatorProcess(""),
-     globalTime(0.0)
+     globalTime(0.0), numbounces(0), tracklength(0)
 {;}
 
-WCSimTrajectory::WCSimTrajectory(const G4Track* aTrack)
+WCSimTrajectory::WCSimTrajectory(const G4Track* aTrack) : numbounces(0), tracklength(0)
 {
   G4ParticleDefinition * fpParticleDefinition = aTrack->GetDefinition();
   ParticleName = fpParticleDefinition->GetParticleName();
   PDGCharge = fpParticleDefinition->GetPDGCharge();
   PDGEncoding = fpParticleDefinition->GetPDGEncoding();
+  if(fpParticleDefinition==G4OpticalPhoton::OpticalPhotonDefinition()){PDGEncoding=100;}
   fTrackID = aTrack->GetTrackID();
   fParentID = aTrack->GetParentID();
   initialMomentum = aTrack->GetMomentum();

@@ -58,12 +58,15 @@ public:
   void incrementFVWaterTubeHits() { numberOfTimesFVWaterTubeHit++;} 
   void incrementCatcherHits()     { numberOfTimesCatcherHit++;}
   void SetNtuples(int ntup) {ntuples=ntup;}
+  
+  TTree* GetPhotonTree(){ return photontree;}
 
 private:
   // MFechner : set by the messenger
   std::string RootFileName;
   //
   TTree* WCSimTree;
+  TTree* photontree;
   TBranch* wcsimrooteventbranch;
   TBranch* wcsimrooteventbranch_mrd;
   TBranch* wcsimrooteventbranch_facc;

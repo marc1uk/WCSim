@@ -71,6 +71,11 @@ public: // with description
    { stoppingPoint = currentPosition;}
    inline void SetStoppingVolume(G4VPhysicalVolume* currentVolume)
    { stoppingVolume = currentVolume;}
+   
+   inline void SetNumReflections(int numrefsin) { numbounces=numrefsin; }
+   inline void SetTrackLength(double lengthin) { tracklength=lengthin; }
+   inline int GetNumReflections() { return numbounces; }
+   inline double GetTrackLength() { return tracklength;}
 
 
 // Other member functions
@@ -107,6 +112,9 @@ public: // with description
   G4bool SaveIt;
   G4String creatorProcess;
   G4double                  globalTime;
+  
+  int numbounces;
+  double tracklength;
 };
 
 /***            TEMP  : M FECHNER ***********

@@ -91,6 +91,17 @@ void WCSimRunAction::BeginOfRunAction(const G4Run* /*aRun*/)
   TBranch *geoBranch = geoTree->Branch("wcsimrootgeom", "WCSimRootGeom", &wcsimrootgeom, bufsize,0);
 
   FillGeoTree();
+
+  TFile* photonfile = new TFile("opticalphotons.root","RECREATE","Photon ROOT file");
+  photontree = new TTree("photontree","Photon Tree");
+  int eventnum=0; 
+  std::vector<int> bouncecount;
+  std::vector<int>* bouncecountp=&bouncecount;
+  std::vector<int> tracklength;
+  std::vector<int>* tracklengthp=&tracklength;
+  TBranch* evtnumbranch = photontree->Branch("photevt",&eventnum);
+  TBranch* bouncebranch = photontree->Branch("photonbounces",&bouncecountp);
+  TBranch* lengthbranch = photontree->Branch("tracklength",&tracklengthp);
 }
 
 void WCSimRunAction::EndOfRunAction(const G4Run*)
@@ -111,6 +122,9 @@ void WCSimRunAction::EndOfRunAction(const G4Run*)
 
   TFile* hfile = WCSimTree->GetCurrentFile();
   hfile->Close();
+  
+  TFile* pfile = photontree->GetCurrentFile();
+  pfile->Close();
 
   // Clean up stuff on the heap; I think deletion of hfile and trees
   // is taken care of by the file close

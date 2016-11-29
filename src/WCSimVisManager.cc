@@ -4,8 +4,10 @@
 #ifdef G4VIS_USE
 
 #include "WCSimVisManager.hh"
+#include "G4VisExecutive.hh"
 #include "G4TrajectoryDrawByParticleID.hh"
 #include "G4TrajectoryModelFactories.hh"
+
 
 // Supported drivers...
 

@@ -17,6 +17,7 @@
 #include "WCSimTrackingAction.hh"
 #include "WCSimSteppingAction.hh"
 #include "WCSimVisManager.hh"
+#include "G4VisExecutive.hh"
 #include "WCSimRandomParameters.hh"
 #include <unistd.h>
 
@@ -80,10 +81,11 @@ int main(int argc,char** argv)
   G4cout<<"Getting further job options from jobOptions2.mac"<<G4endl;
   file_exists("jobOptions2.mac");
   UI->ApplyCommand("/control/execute jobOptions2.mac");
-  G4cout<<"Creating visualisation manager"<<G4endl;
 #ifdef G4VIS_USE
   // Visualization
-  G4VisManager* visManager = new WCSimVisManager;
+  G4cout<<"Creating visualisation manager"<<G4endl;
+  //G4VisManager* visManager = new WCSimVisManager;
+  G4VisManager* visManager = new G4VisExecutive;
   visManager->Initialize();
 #endif
   G4cout<<"Creating Primary Generator Action"<<G4endl;

@@ -29,21 +29,23 @@ WCSimTrackingAction::~WCSimTrackingAction(){;}
 
 void WCSimTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 {
-  G4float percentageOfCherenkovPhotonsToDraw = 0.0;
+  G4float percentageOfCherenkovPhotonsToDraw = 100.0;
   
 //  static int line=0; line++;
   
   if (aTrack->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition()
-       || G4UniformRand() < percentageOfCherenkovPhotonsToDraw)
+       || G4UniformRand() < percentageOfCherenkovPhotonsToDraw||true)
     {
       WCSimTrajectory* thisTrajectory = new WCSimTrajectory(aTrack);
       fpTrackingManager->SetTrajectory(thisTrajectory);
       fpTrackingManager->SetStoreTrajectory(true);
     }
-  else 
+  else {
     fpTrackingManager->SetStoreTrajectory(false);
+  }
   
   WCSimTrackInformation* anInfo = new WCSimTrackInformation();
+  anInfo->WillBeSaved(false); 
   G4Track* theTrack = (G4Track*)aTrack;
   theTrack->SetUserInformation(anInfo);
 }
@@ -122,15 +124,24 @@ void WCSimTrackingAction::PostUserTrackingAction(const G4Track* aTrack)
     if (anInfo->isSaved())
       currentTrajectory->SetSaveFlag(true);// mark it for WCSimEventAction ;
     else currentTrajectory->SetSaveFlag(false);// mark it for WCSimEventAction ;
-  } 
+  } else { /*new*/ 
+      WCSimTrajectory *currentTrajectory = (WCSimTrajectory*)fpTrackingManager->GimmeTrajectory();
+      G4ThreeVector currentPosition      = aTrack->GetPosition();
+      G4VPhysicalVolume* currentVolume   = aTrack->GetVolume();
+      currentTrajectory->SetStoppingPoint(currentPosition);
+      currentTrajectory->SetStoppingVolume(currentVolume);
+      currentTrajectory->SetNumReflections(anInfo->GetNumReflections());
+      currentTrajectory->SetTrackLength(aTrack->GetTrackLength()/mm);
+  }
   
   static int line=0;
-  if(line%100000==0){ //100000
+  if(line%10000==0){ //100000
     G4cout<<"  PostUserTrackingAction call number: "<<line<<", "<<aTrack->GetDefinition()->GetParticleName();
     if(creatorProcess){G4cout<<" from "<<creatorProcess->GetProcessName();} else {G4cout<<" primary";}
     G4cout<<" in "<<aTrack->GetVolume()->GetName()<<G4endl; 
   }
   line++;
+  
 }
 
 

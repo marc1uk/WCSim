@@ -185,7 +185,7 @@ G4VPhysicalVolume* physiGlassFaceWCPMT = new G4PVPlacement(0,
                         logicWCPMT,
                         false,
                         0,
-                        false);
+                        true);
 
 /* ###### note: the solid, logical and physical volumes corresponding to the glass PMT face are all 
 given the name CollectionName, which is passed in when ConstructPMT is called! ########### */

@@ -18,7 +18,7 @@ private:
   long long int numreflections;
 
 public:
-  WCSimTrackInformation() : saveit(false), primaryParentID(-1) {}
+  WCSimTrackInformation() : saveit(false), primaryParentID(-1), numreflections(0) {}
   WCSimTrackInformation(const WCSimTrackInformation* aninfo) 
   { saveit = aninfo->saveit; primaryParentID = aninfo->primaryParentID;}
   virtual ~WCSimTrackInformation() {}
