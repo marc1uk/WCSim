@@ -28,6 +28,8 @@ WCSimDetectorMessenger::WCSimDetectorMessenger(WCSimDetectorConstruction* WCSimD
 			  "HyperK\n"
 			  "EggShapedHyperK\n"
 			  "EggShapedHyperK_withHPD\n"
+			  "ANNIEp1\n"
+			  "ANNIEp2\n"
 			  );
   PMTConfig->SetParameterName("PMTConfig", false);
   PMTConfig->SetCandidates("SuperK "
@@ -41,6 +43,8 @@ WCSimDetectorMessenger::WCSimDetectorMessenger(WCSimDetectorConstruction* WCSimD
 			  "HyperK "
 			  "EggShapedHyperK "
 			  "EggShapedHyperK_withHPD "
+			  "ANNIEp1 "
+			  "ANNIEp2 "
 			  );
   PMTConfig->AvailableForStates(G4State_PreInit, G4State_Idle);
 
@@ -121,7 +125,7 @@ WCSimDetectorMessenger::~WCSimDetectorMessenger()
 
 void WCSimDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 {    
-	if( command == PMTConfig ) { 
+	if( command == PMTConfig ) {
 		WCSimDetector->SetIsUpright(false);
 		WCSimDetector->SetIsEggShapedHyperK(false);
 		if ( newValue == "SuperK") {
@@ -148,8 +152,13 @@ void WCSimDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 		} else if ( newValue == "EggShapedHyperK_withHPD") {
 		  WCSimDetector->SetIsEggShapedHyperK(true);
 		  WCSimDetector->SetEggShapedHyperKGeometry_withHPD();
-		} else
-		  G4cout << "That geometry choice is not defined!" << G4endl;
+		} else if (newValue == "ANNIEp1") {
+		  WCSimDetector->SetANNIEPhase1Geometry();
+		} else if (newValue == "ANNIEp2") {
+		  WCSimDetector->SetANNIEPhase2Geometry();
+		} else {
+		  G4cout << "That geometry choice not defined!" << G4endl;
+		}
 	}
   
 	if (command == SavePi0){

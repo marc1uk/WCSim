@@ -22,6 +22,10 @@
 #define NPMTS_VERBOSE 10
 #endif
 
+#ifndef HYPER_VERBOSITY
+//#define HYPER_VERBOSITY
+#endif
+
 
 // *******************************************
 // BASE CLASS
@@ -34,13 +38,23 @@
 WCSimWCDigitizerBase::WCSimWCDigitizerBase(G4String name,
 					   WCSimDetectorConstruction* inDetector,
 					   WCSimWCDAQMessenger* myMessenger,
-					   DigitizerType_t digitype)
-  :G4VDigitizerModule(name), myDetector(inDetector), DAQMessenger(myMessenger), DigitizerType(digitype)
+					   DigitizerType_t digitype, G4String detectorElement)
+  :G4VDigitizerModule(name), myDetector(inDetector), DAQMessenger(myMessenger), DigitizerType(digitype), detectorElement(detectorElement)
 {
-  G4String colName = "WCDigitizedStoreCollection";
+  G4String colName;
+  if(detectorElement=="tank"){
+  	colName = "WCDigitizedStoreCollection";
+  } else if(detectorElement=="mrd"){
+  	colName = "WCDigitizedStoreCollection_MRD";
+  } else if(detectorElement=="facc"){
+  	colName = "WCDigitizedStoreCollection_FACC";
+  }
   collectionName.push_back(colName);
   ReInitialize();
-
+#ifdef HYPER_VERBOSITY
+  if(detectorElement=="mrd"){
+  G4cout<<"WCSimWCDigitizerBase::WCSimWCDigitizerBase ☆ recording collection name "<<colName<<" for "<<detectorElement<<G4endl;}
+#endif
   if(DAQMessenger == NULL) {
     G4cerr << "WCSimWCDAQMessenger pointer is NULL when passed to WCSimWCDigitizerBase constructor. Exiting..." 
 	   << G4endl;
@@ -79,22 +93,34 @@ void WCSimWCDigitizerBase::Digitize()
 
   //Clear the DigiStoreHitMap
   ReInitialize();
-
   //Temporary Storage of Digitized hits which is passed to the trigger
   DigiStore = new WCSimWCDigitsCollection(collectionName[0],collectionName[0]);
 
   G4DigiManager* DigiMan = G4DigiManager::GetDMpointer();
   
   // Get the PMT collection ID
-   G4int WCHCID = DigiMan->GetDigiCollectionID("WCRawPMTSignalCollection");
+  G4String rawcollectionName;
+  if(detectorElement=="tank"){
+  	rawcollectionName = "WCRawPMTSignalCollection";
+  } else if(detectorElement=="mrd"){
+  	rawcollectionName = "WCRawPMTSignalCollection_MRD";
+  } else if(detectorElement=="facc"){
+  	rawcollectionName = "WCRawPMTSignalCollection_FACC";
+  }
+  G4int WCHCID = DigiMan->GetDigiCollectionID(rawcollectionName);
 
   // Get the PMT Digits collection
-  WCSimWCDigitsCollection* WCHCPMT = 
-    (WCSimWCDigitsCollection*)(DigiMan->GetDigiCollection(WCHCID));
+  WCSimWCDigitsCollection* WCHCPMT = (WCSimWCDigitsCollection*)(DigiMan->GetDigiCollection(WCHCID));
+  
+#ifdef HYPER_VERBOSITY
+  if(detectorElement=="mrd"){
+  G4cout<<"WCSimWCDigitizerBase::Digitize ☆ making digits collection (WCSimWCDigitsCollection*)"<<collectionName[0]
+  <<" for "<<detectorElement<<" and calling DigitizeHits on "<<rawcollectionName<<" to fill it"<<G4endl;}
+#endif
   
   if (WCHCPMT) {
     DigitizeHits(WCHCPMT);
-  }
+  } else {G4cout<<"WCSimWCDigitizerBase::Digitize didn't find hit collection for "<<detectorElement<<G4endl;}
   
   StoreDigiCollection(DigiStore);
 
@@ -158,8 +184,8 @@ bool WCSimWCDigitizerBase::AddNewDigit(int tube, int gate, float digihittime, fl
 
 WCSimWCDigitizerSKI::WCSimWCDigitizerSKI(G4String name,
 					 WCSimDetectorConstruction* myDetector,
-					 WCSimWCDAQMessenger* myMessenger)
-  : WCSimWCDigitizerBase(name, myDetector, myMessenger, kDigitizerSKI)
+					 WCSimWCDAQMessenger* myMessenger, G4String detectorElement)
+  : WCSimWCDigitizerBase(name, myDetector, myMessenger, kDigitizerSKI, detectorElement)
 {
   GetVariables();
 }
@@ -168,7 +194,15 @@ WCSimWCDigitizerSKI::~WCSimWCDigitizerSKI(){
 }
 
 void WCSimWCDigitizerSKI::DigitizeHits(WCSimWCDigitsCollection* WCHCPMT) {
-  G4cout << "WCSimWCDigitizerSKI::DigitizeHits START WCHCPMT->entries() = " << WCHCPMT->entries() << G4endl;
+
+#ifdef HYPER_VERBOSITY
+  if(detectorElement=="mrd"){G4cout<<"WCSimWCDigitizerBase::DigitizeHits ☆ digitizing "<<WCHCPMT->entries()<<" entries"<<G4endl;}
+#endif
+  G4cout << "WCSimWCDigitizerSKI::DigitizeHits START ";
+  if(detectorElement=="tank"){ G4cout<<"WCHCPMT->entries() = ";}
+  if(detectorElement=="mrd"){  G4cout<<"HCMRD  ->entries() = ";}
+  if(detectorElement=="facc"){ G4cout<<"HCFACC ->entries() = ";}
+  G4cout<< WCHCPMT->entries() << G4endl;
   
   //loop over entires in WCHCPMT, each entry corresponds to
   //the photons on one PMT

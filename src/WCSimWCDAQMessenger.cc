@@ -8,6 +8,7 @@
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithADouble.hh"
 #include "G4UIcmdWithAnInteger.hh"
+#include "G4UIcmdWithAString.hh"
 
 #include <string>
 

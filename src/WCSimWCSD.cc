@@ -14,8 +14,8 @@
 #include "WCSimDetectorConstruction.hh"
 #include "WCSimTrackInformation.hh"
 
-WCSimWCSD::WCSimWCSD(G4String CollectionName, G4String name,WCSimDetectorConstruction* myDet)
-:G4VSensitiveDetector(name)
+WCSimWCSD::WCSimWCSD(G4String CollectionName, G4String name,WCSimDetectorConstruction* myDet, G4String detectorElement="tank")
+:G4VSensitiveDetector(name), detectorElement(detectorElement)
 {
   // Place the name of this collection on the list.  We can have more than one
   // in principle.  CollectionName is a vector.
@@ -87,31 +87,41 @@ G4bool WCSimWCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   G4int    trackID           = aStep->GetTrack()->GetTrackID();
   G4String volumeName        = aStep->GetTrack()->GetVolume()->GetName();
   
+  
   //XQ Add the wavelength there
-  G4float  wavelength = (2.0*M_PI*197.3)/( aStep->GetTrack()->GetTotalEnergy()/eV);
+  G4float stepEnergy =aStep->GetTrack()->GetTotalEnergy()/CLHEP::eV;
+  G4float  wavelength = (stepEnergy!=0) ? (2.0*M_PI*197.3)/(stepEnergy) : 0;
   
   G4double energyDeposition  = aStep->GetTotalEnergyDeposit();
   G4double hitTime           = aStep->GetPreStepPoint()->GetGlobalTime();
 
   G4ParticleDefinition *particleDefinition = 
     aStep->GetTrack()->GetDefinition();
+    
 
   if ( particleDefinition != G4OpticalPhoton::OpticalPhotonDefinition() 
        && energyDeposition == 0.0) 
     return false;
   // MF : I don't see why other particles should register hits
   // they don't in skdetsim. 
-  if ( particleDefinition != G4OpticalPhoton::OpticalPhotonDefinition())
+  if ( particleDefinition != G4OpticalPhoton::OpticalPhotonDefinition()){
     return false;
-  G4String WCIDCollectionName = fdet->GetIDCollectionName();
+  }
+  G4String WCCollectionName;
+  if(detectorElement=="tank"){
+  	WCCollectionName = fdet->GetIDCollectionName();
+  } else if (detectorElement=="mrd"){
+  	WCCollectionName = fdet->GetMRDCollectionName();
+  } else if (detectorElement=="facc"){
+  	WCCollectionName = fdet->GetFACCCollectionName();
+  }
   // M Fechner : too verbose
   //  if (aStep->GetTrack()->GetTrackStatus() == fAlive)G4cout << "status is fAlive\n";
   if ((aStep->GetTrack()->GetTrackStatus() == fAlive )
-      &&(particleDefinition == G4OpticalPhoton::OpticalPhotonDefinition()))
-    return false;
+      &&(particleDefinition == G4OpticalPhoton::OpticalPhotonDefinition())){
+      return false;
+  }
 
-  //  if ( particleDefinition ==  G4OpticalPhoton::OpticalPhotonDefinition() ) 
-  // G4cout << volumeName << " hit by optical Photon! " << G4endl;
     
   // Make the tubeTag string based on the replica numbers
   // See WCSimDetectorConstruction::DescribeAndRegisterPMT() for matching
@@ -134,12 +144,18 @@ G4bool WCSimWCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 //  G4cout << tubeTag.str() << G4endl;
 
   // Get the tube ID from the tubeTag
-  G4int replicaNumber = WCSimDetectorConstruction::GetTubeID(tubeTag.str());
+  G4int replicaNumber;
+  if(detectorElement=="tank"){
+    replicaNumber = WCSimDetectorConstruction::GetTubeID(tubeTag.str());
+  } else if(detectorElement=="mrd"){
+    replicaNumber = WCSimDetectorConstruction::GetMrdTubeID(tubeTag.str());
+  } else if(detectorElement=="facc"){
+    replicaNumber = WCSimDetectorConstruction::GetFaccTubeID(tubeTag.str());
+  }
 
     
   G4float theta_angle;
   G4float effectiveAngularEfficiency;
-
 
   
   G4float ratio = 1.;
@@ -148,7 +164,7 @@ G4bool WCSimWCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   if (fdet->GetPMT_QE_Method()==1){
     photonQE = 1.1;
   }else if (fdet->GetPMT_QE_Method()==2){
-    maxQE = fdet->GetPMTQE(WCIDCollectionName,wavelength,0,240,660,ratio);
+    maxQE = fdet->GetPMTQE(WCCollectionName,wavelength,0,240,660,ratio);
     photonQE = fdet->GetPMTQE(volumeName, wavelength,1,240,660,ratio);
     photonQE = photonQE/maxQE;
   }else if (fdet->GetPMT_QE_Method()==3){
@@ -214,7 +230,7 @@ void WCSimWCSD::EndOfEvent(G4HCofThisEvent*)
   { 
     G4int numHits = hitsCollection->entries();
 
-    G4cout << "There are " << numHits << " hits in the WC: " << G4endl;
+    G4cout << "There are " << numHits << " hits in the "<<detectorElement<<" : "<< G4endl;
     for (G4int i=0; i < numHits; i++) 
       (*hitsCollection)[i]->Print();
   } 

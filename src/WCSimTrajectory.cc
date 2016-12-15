@@ -2,6 +2,7 @@
 
 #include "G4TrajectoryPoint.hh"
 #include "G4ParticleTable.hh"
+#include "G4ParticleTypes.hh"
 #include "G4AttDefStore.hh"
 #include "G4AttDef.hh"
 #include "G4AttValue.hh"
@@ -93,7 +94,9 @@ void WCSimTrajectory::ShowTrajectory(std::ostream& os) const
 void WCSimTrajectory::DrawTrajectory(G4int i_mode) const
 {
   // Invoke the default implementation in G4VTrajectory...
-  G4VTrajectory::DrawTrajectory(i_mode);
+  // i_mode is removed in 4.10 - FDL
+  //G4VTrajectory::DrawTrajectory(i_mode);
+  G4VTrajectory::DrawTrajectory();
   // ... or override with your own code here.
 }
 

@@ -29,9 +29,9 @@ void WCSimDetectorConstruction::PrintGeometryTree
   for (int levels = 0; levels < aDepth; levels++) G4cout << " ";
   G4cout << aPV->GetName() << " Level:" << aDepth 
 	 << " Pos:" << aTransform.getTranslation() 
-	 << " Rot:" << aTransform.getRotation().getTheta()/deg 
-	 << "," << aTransform.getRotation().getPhi()/deg 
-	 << "," << aTransform.getRotation().getPsi()/deg
+	 << " Rot:" << aTransform.getRotation().getTheta()/CLHEP::deg 
+	 << "," << aTransform.getRotation().getPhi()/CLHEP::deg 
+	 << "," << aTransform.getRotation().getPsi()/CLHEP::deg
 	 << G4endl;
 }
 
@@ -47,16 +47,16 @@ void WCSimDetectorConstruction::GetWCGeom
     if ((aPV->GetName() == "WCBarrel") ||
         (aPV->GetName() == "WorldBox")) {    // last condition is the HyperK Envelope name.
     // Stash info in data member
-    WCOffset = G4ThreeVector(aTransform.getTranslation().getX()/cm,
-			     aTransform.getTranslation().getY()/cm,
-			     aTransform.getTranslation().getZ()/cm);
+    WCOffset = G4ThreeVector(aTransform.getTranslation().getX()/CLHEP::cm,
+			     aTransform.getTranslation().getY()/CLHEP::cm,
+			     aTransform.getTranslation().getZ()/CLHEP::cm);
     }
 
 	
 
     // Stash info in data member
     // AH Need to store this in CM for it to be understood by SK code
-    WCPMTSize = WCPMTRadius/cm;// I think this is just a variable no if needed
+    WCPMTSize = WCPMTRadius/CLHEP::cm;// I think this is just a variable no if needed
 
 
     // Note WC can be off-center... get both extremities
@@ -70,9 +70,9 @@ void WCSimDetectorConstruction::GetWCGeom
     }
 
     if ((aPV->GetName() == "WCCapBlackSheet") || (aPV->GetName().find("glassFaceWCPMT") != std::string::npos)){ 
-      G4float x =  aTransform.getTranslation().getX()/cm;
-      G4float y =  aTransform.getTranslation().getY()/cm;
-      G4float z =  aTransform.getTranslation().getZ()/cm;
+      G4float x =  aTransform.getTranslation().getX()/CLHEP::cm;
+      G4float y =  aTransform.getTranslation().getY()/CLHEP::cm;
+      G4float z =  aTransform.getTranslation().getZ()/CLHEP::cm;
       
       if (x<xmin){xmin=x;}
       if (x>xmax){xmax=x;}
@@ -102,14 +102,21 @@ void WCSimDetectorConstruction::DescribeAndRegisterPMT(G4VPhysicalVolume* aPV ,i
 
   depth << replicaNo;
   pvname << aPV->GetName();
+  G4String thepvname = aPV->GetName();
 
   replicaNoString[aDepth] = pvname.str() + "-" + depth.str();
 
-  if (aPV->GetName()== WCIDCollectionName ||aPV->GetName()== WCODCollectionName ) 
+  if (thepvname== WCIDCollectionName ||thepvname== WCODCollectionName ||thepvname== WCMRDCollectionName ||thepvname== WCFACCCollectionName) 
     {
 
     // First increment the number of PMTs in the tank.
-    totalNumPMTs++;  
+    if(thepvname==WCIDCollectionName||thepvname==WCODCollectionName){
+      totalNumPMTs++;  
+    } else if(thepvname==WCMRDCollectionName){
+      totalNumMrdPMTs++;
+    } else if(thepvname==WCFACCCollectionName){
+      totalNumFaccPMTs++;
+    }
     
     // Put the location of this tube into the location map so we can find
     // its ID later.  It is coded by its tubeTag string.
@@ -120,6 +127,7 @@ void WCSimDetectorConstruction::DescribeAndRegisterPMT(G4VPhysicalVolume* aPV ,i
       tubeTag += ":" + replicaNoString[i];
     // G4cout << tubeTag << G4endl;
     
+    if(thepvname==WCIDCollectionName){
     if ( tubeLocationMap.find(tubeTag) != tubeLocationMap.end() ) {
         G4cerr << "Repeated tube tag: " << tubeTag << G4endl;
         G4cerr << "Assigned to both tube #" << tubeLocationMap[tubeTag] << " and #" << totalNumPMTs << G4endl;
@@ -131,17 +139,45 @@ void WCSimDetectorConstruction::DescribeAndRegisterPMT(G4VPhysicalVolume* aPV ,i
     
     // Put the transform for this tube into the map keyed by its ID
     tubeIDMap[totalNumPMTs] = aTransform;
+    
+   } else if(thepvname==WCMRDCollectionName){
    
+    if ( mrdtubeLocationMap.find(tubeTag) != mrdtubeLocationMap.end() ) {
+        G4cerr << "Repeated tube tag: " << tubeTag << G4endl;
+        G4cerr << "Assigned to both tube #" << mrdtubeLocationMap[tubeTag] << " and #" << totalNumMrdPMTs << G4endl;
+        G4cerr << "Cannot continue -- hits will not be recorded correctly."  << G4endl;
+        G4cerr << "Please make sure that logical volumes with multiple placements are each given a unique copy number" << G4endl;
+        assert(false);
+    }
+    mrdtubeLocationMap[tubeTag] = totalNumMrdPMTs;
+    
+    // Put the transform for this tube into the map keyed by its ID
+    mrdtubeIDMap[totalNumMrdPMTs] = aTransform;
+    
+    } else if(thepvname==WCFACCCollectionName){
+    
+    if ( facctubeLocationMap.find(tubeTag) != facctubeLocationMap.end() ) {
+        G4cerr << "Repeated tube tag: " << tubeTag << G4endl;
+        G4cerr << "Assigned to both tube #" << facctubeLocationMap[tubeTag] << " and #" << totalNumFaccPMTs << G4endl;
+        G4cerr << "Cannot continue -- hits will not be recorded correctly."  << G4endl;
+        G4cerr << "Please make sure that logical volumes with multiple placements are each given a unique copy number" << G4endl;
+        assert(false);
+    }
+    facctubeLocationMap[tubeTag] = totalNumFaccPMTs;
+    
+    // Put the transform for this tube into the map keyed by its ID
+    facctubeIDMap[totalNumFaccPMTs] = aTransform;
+    }
     
     // G4cout <<  "depth " << depth.str() << G4endl;
     // G4cout << "tubeLocationmap[" << tubeTag  << "]= " << tubeLocationMap[tubeTag] << "\n";
       
     // Print
     //     G4cout << "Tube: "<<std::setw(4) << totalNumPMTs << " " << tubeTag
-    //     	   << " Pos:" << aTransform.getTranslation()/cm 
-    //     	   << " Rot:" << aTransform.getRotation().getTheta()/deg 
-    //     	   << "," << aTransform.getRotation().getPhi()/deg 
-    //     	   << "," << aTransform.getRotation().getPsi()/deg
+    //     	   << " Pos:" << aTransform.getTranslation()/CLHEP::cm 
+    //     	   << " Rot:" << aTransform.getRotation().getTheta()/CLHEP::deg 
+    //     	   << "," << aTransform.getRotation().getPhi()/CLHEP::deg 
+    //     	   << "," << aTransform.getRotation().getPsi()/CLHEP::deg
     //     	   << G4endl; 
   }
 }
@@ -160,8 +196,8 @@ void WCSimDetectorConstruction::DumpGeometryTableToFile()
   // (JF) Get first tube transform for filling in detector radius
   // the height is still done with WCCylInfo above
   G4Transform3D firstTransform = tubeIDMap[2];
-  innerradius = sqrt(pow(firstTransform.getTranslation().getX()/cm,2)
-                            + pow(firstTransform.getTranslation().getY()/cm,2));
+  innerradius = sqrt(pow(firstTransform.getTranslation().getX()/CLHEP::cm,2)
+                            + pow(firstTransform.getTranslation().getY()/CLHEP::cm,2));
 
   if (isEggShapedHyperK){
     geoFile << setw(8)<< 0;
@@ -209,9 +245,9 @@ void WCSimDetectorConstruction::DumpGeometryTableToFile()
     
     geoFile.precision(9);
      geoFile << setw(4) << tubeID 
- 	    << " " << setw(8) << newTransform.getTranslation().getX()/cm
- 	    << " " << setw(8) << newTransform.getTranslation().getY()/cm
- 	    << " " << setw(8) << newTransform.getTranslation().getZ()/cm
+ 	    << " " << setw(8) << newTransform.getTranslation().getX()/CLHEP::cm
+ 	    << " " << setw(8) << newTransform.getTranslation().getY()/CLHEP::cm
+ 	    << " " << setw(8) << newTransform.getTranslation().getZ()/CLHEP::cm
 	    << " " << setw(7) << pmtOrientation.x()
 	    << " " << setw(7) << pmtOrientation.y()
 	    << " " << setw(7) << pmtOrientation.z()
@@ -219,15 +255,115 @@ void WCSimDetectorConstruction::DumpGeometryTableToFile()
  	    << G4endl;
      
      WCSimPmtInfo *new_pmt = new WCSimPmtInfo(cylLocation,
-					      newTransform.getTranslation().getX()/cm,
-					      newTransform.getTranslation().getY()/cm,
-					      newTransform.getTranslation().getZ()/cm,
+					      newTransform.getTranslation().getX()/CLHEP::cm,
+					      newTransform.getTranslation().getY()/CLHEP::cm,
+					      newTransform.getTranslation().getZ()/CLHEP::cm,
 					      pmtOrientation.x(),
 					      pmtOrientation.y(),
 					      pmtOrientation.z(),
 					      tubeID);
      
      fpmts.push_back(new_pmt);
+
+  }
+  
+  geoFile<<"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n";
+  // Record locations of MRD and FACC PMTs, both to file and to fmrdpmts and ffaccpmts variables
+  for (unsigned int i=0;i<fmrdpmts.size();i++){
+    delete fmrdpmts.at(i);
+  }
+  fmrdpmts.clear();
+
+  // Grab the tube information from the tubeID Map and dump to file.
+  for ( int tubeID = 1; tubeID <= totalNumMrdPMTs; tubeID++){
+    G4Transform3D newTransform = mrdtubeIDMap[tubeID];
+
+    // Get tube orientation vector
+    G4Vector3D nullOrient = G4Vector3D(0,0,1);
+    G4Vector3D pmtOrientation = newTransform * nullOrient;
+    //cyl_location cylLocation = tubeCylLocation[tubeID];
+
+    // TODO: make these record something sensible for the MRD/FACC
+    if (pmtOrientation*newTransform.getTranslation() > 0)//veto pmt
+    {cylLocation=3;}
+    else if (pmtOrientation.z()==1.0)//bottom
+    {cylLocation=2;}
+    else if (pmtOrientation.z()==-1.0)//top
+    {cylLocation=0;}
+    else // barrel
+    {cylLocation=1;}
+    
+    geoFile.precision(9);
+     geoFile << setw(4) << tubeID 
+ 	    << " " << setw(8) << newTransform.getTranslation().getX()/CLHEP::cm
+ 	    << " " << setw(8) << newTransform.getTranslation().getY()/CLHEP::cm
+ 	    << " " << setw(8) << newTransform.getTranslation().getZ()/CLHEP::cm
+	    << " " << setw(7) << pmtOrientation.x()
+	    << " " << setw(7) << pmtOrientation.y()
+	    << " " << setw(7) << pmtOrientation.z()
+ 	    << " " << setw(3) << cylLocation
+ 	    << G4endl;
+     
+     WCSimPmtInfo *new_pmt = new WCSimPmtInfo(cylLocation,
+					      newTransform.getTranslation().getX()/CLHEP::cm,
+					      newTransform.getTranslation().getY()/CLHEP::cm,
+					      newTransform.getTranslation().getZ()/CLHEP::cm,
+					      pmtOrientation.x(),
+					      pmtOrientation.y(),
+					      pmtOrientation.z(),
+					      tubeID);
+     
+     fmrdpmts.push_back(new_pmt);
+
+  }
+  
+    // now facc
+  for (unsigned int i=0;i<ffaccpmts.size();i++){
+    delete ffaccpmts.at(i);
+  }
+  ffaccpmts.clear();
+
+  // Grab the tube information from the tubeID Map and dump to file.
+  for ( int tubeID = 1; tubeID <= totalNumFaccPMTs; tubeID++){
+    G4Transform3D newTransform = facctubeIDMap[tubeID];
+
+    // Get tube orientation vector
+    G4Vector3D nullOrient = G4Vector3D(0,0,1);
+    G4Vector3D pmtOrientation = newTransform * nullOrient;
+    //cyl_location cylLocation = tubeCylLocation[tubeID];
+
+    // Figure out if pmt is on top/bottom or barrel
+    // print key: 0-top, 1-barrel, 2-bottom
+    if (pmtOrientation*newTransform.getTranslation() > 0)//veto pmt
+    {cylLocation=3;}
+    else if (pmtOrientation.z()==1.0)//bottom
+    {cylLocation=2;}
+    else if (pmtOrientation.z()==-1.0)//top
+    {cylLocation=0;}
+    else // barrel
+    {cylLocation=1;}
+    
+    geoFile.precision(9);
+     geoFile << setw(4) << tubeID 
+ 	    << " " << setw(8) << newTransform.getTranslation().getX()/CLHEP::cm
+ 	    << " " << setw(8) << newTransform.getTranslation().getY()/CLHEP::cm
+ 	    << " " << setw(8) << newTransform.getTranslation().getZ()/CLHEP::cm
+	    << " " << setw(7) << pmtOrientation.x()
+	    << " " << setw(7) << pmtOrientation.y()
+	    << " " << setw(7) << pmtOrientation.z()
+ 	    << " " << setw(3) << cylLocation
+ 	    << G4endl;
+     
+     WCSimPmtInfo *new_pmt = new WCSimPmtInfo(cylLocation,
+					      newTransform.getTranslation().getX()/CLHEP::cm,
+					      newTransform.getTranslation().getY()/CLHEP::cm,
+					      newTransform.getTranslation().getZ()/CLHEP::cm,
+					      pmtOrientation.x(),
+					      pmtOrientation.y(),
+					      pmtOrientation.z(),
+					      tubeID);
+     
+     ffaccpmts.push_back(new_pmt);
 
   }
   geoFile.close();

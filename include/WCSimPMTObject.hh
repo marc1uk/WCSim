@@ -24,6 +24,8 @@ public:
   virtual G4double GetPMTGlassThickness()=0;
   virtual G4float  GetDarkRate()=0;
   virtual G4float  GetDarkRateConversionFactor()=0;
+  virtual G4double GetGelThickness(){ return 0.;};
+  virtual G4double GetShamferRadius(){ return 0.;};
 protected:
   virtual G4float* GetCollectionEfficiencyArray();
   virtual G4float* GetCollectionEfficiencyAngle();
@@ -235,5 +237,48 @@ protected:
   G4float* GetCollectionEfficiencyArray();
 };
 
+class FlatFacedPMT2inch : public WCSimPMTObject
+{
+public:
+FlatFacedPMT2inch();
+~FlatFacedPMT2inch();
+
+public:
+  G4String GetPMTName(); 
+  G4double GetExposeHeight(); 
+  G4double GetRadius();
+  G4float* Getqpe();
+  G4float* GetQE();
+  G4float* GetQEWavelength();
+  G4float  GetmaxQE();
+  float    HitTimeSmearing(float);
+  G4double GetPMTGlassThickness();
+  G4float  GetDarkRate();
+  G4float  GetDarkRateConversionFactor();
+  G4double GetGelThickness();
+  G4double GetShamferRadius();
+};
+
+class FlatFacedPMT4inch : public WCSimPMTObject
+{
+public:
+FlatFacedPMT4inch();
+~FlatFacedPMT4inch();
+
+public:
+  G4String GetPMTName(); 
+  G4double GetExposeHeight(); 
+  G4double GetRadius();
+  G4float* Getqpe();
+  G4float* GetQE();
+  G4float* GetQEWavelength();
+  G4float  GetmaxQE();
+  float    HitTimeSmearing(float);
+  G4double GetPMTGlassThickness();
+  G4float  GetDarkRate();
+  G4float  GetDarkRateConversionFactor();
+  G4double GetGelThickness();
+  G4double GetShamferRadius();
+};
 
 #endif

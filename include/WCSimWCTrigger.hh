@@ -35,7 +35,7 @@ class WCSimWCTriggerBase : public G4VDigitizerModule
 public:
 
   ///Create WCSimWCTriggerBase instance with knowledge of the detector and DAQ options
-  WCSimWCTriggerBase(G4String name, WCSimDetectorConstruction*, WCSimWCDAQMessenger*);
+  WCSimWCTriggerBase(G4String name, WCSimDetectorConstruction*, WCSimWCDAQMessenger*, G4String);
   
   virtual ~WCSimWCTriggerBase();
 
@@ -50,13 +50,15 @@ public:
   TriggerType_t        GetTriggerType(int i) { return TriggerTypes[i];}
   ///Get the additional trigger information associated with the ith trigger
   std::vector<Float_t> GetTriggerInfo(int i) { return TriggerInfos[i];}
-
+  ///Get the trigger class name
+  G4String GetTriggerClassName(){ return triggerClassName; }
   //
   // Trigger algorithm option set methods
   //
 
   ///Set whether to allow the number of digits per PMT per trigger to go > 1
   void SetMultiDigitsPerTrigger(G4bool allow_multi) { multiDigitsPerTrigger = allow_multi; }
+  G4bool GetMultiDigitsPerTrigger() { return multiDigitsPerTrigger; }
 
   // NDigits options
   ///Set the threshold for the NDigits trigger
@@ -126,6 +128,7 @@ protected:
    * for testing purposes. Triggers issued in this mode have type kTriggerNDigitsTest
    */
   void AlgNDigits(WCSimWCDigitsCollection* WCDCPMT, bool remove_hits, bool test=false);
+  void AlgTankDigits(WCSimWCDigitsCollection* WCDCPMT, bool remove_hits, bool test=false);
 
   WCSimWCTriggeredDigitsCollection*   DigitsCollection; ///< The main output of the class - collection of digits in the trigger window
   std::map<int,int>          DigiHitMap; ///< Keeps track of the PMTs that have been added to the output WCSimWCTriggeredDigitsCollection
@@ -136,6 +139,7 @@ protected:
 
   WCSimWCDAQMessenger*       DAQMessenger; ///< Get the options from the .mac file
   WCSimDetectorConstruction* myDetector;   ///< Know about the detector, so can add appropriate PMT time smearing
+  G4String detectorElement;
 
   /// Clear the Trigger* vectors and DigiHitMap
   void ReInitialize() {
@@ -285,7 +289,7 @@ class WCSimWCTriggerNDigits : public WCSimWCTriggerBase
 public:
 
   ///Create WCSimWCTriggerNDigits instance with knowledge of the detector and DAQ options
-  WCSimWCTriggerNDigits(G4String name, WCSimDetectorConstruction*, WCSimWCDAQMessenger*);
+  WCSimWCTriggerNDigits(G4String name, WCSimDetectorConstruction*, WCSimWCDAQMessenger*, G4String detectorElement);
 
   ~WCSimWCTriggerNDigits();
   
@@ -313,7 +317,7 @@ class WCSimWCTriggerNDigits2 : public WCSimWCTriggerBase
 public:
 
   //not recommended to override these methods
-  WCSimWCTriggerNDigits2(G4String name, WCSimDetectorConstruction*, WCSimWCDAQMessenger*);
+  WCSimWCTriggerNDigits2(G4String name, WCSimDetectorConstruction*, WCSimWCDAQMessenger*, G4String detectorElement);
   ~WCSimWCTriggerNDigits2();
   
 private:
@@ -326,6 +330,31 @@ private:
   int  GetDefaultNDigitsPostTriggerWindow() { return 950;   } ///< SK SLE trigger window ~+950
 };
 
+/**
+ * \class WCSimWCTriggerOnTankDigits
+ *
+ * \brief a trigger class that stores all digits within the trigger windows identified by tank events
+ *
+ */
 
+class WCSimWCTriggerOnTankDigits : public WCSimWCTriggerBase
+{
+public:
+
+  ///Create WCSimWCTriggerNDigits instance with knowledge of the detector and DAQ options
+  WCSimWCTriggerOnTankDigits(G4String name, WCSimDetectorConstruction*, WCSimWCDAQMessenger*, G4String detectorElement);
+
+  ~WCSimWCTriggerOnTankDigits();
+  
+private:
+  ///Calls the workhorse of this class: AlgTankDigits
+  void DoTheWork(WCSimWCDigitsCollection* WCDCPMT);
+
+  bool GetDefaultMultiDigitsPerTrigger()    { return false; } ///< SKI saves only earliest digit on a PMT in the trigger window
+  int  GetDefaultNDigitsWindow()            { return 200;   } ///< SK max light travel time ~200 ns
+  int  GetDefaultNDigitsThreshold()         { return 25;    } ///< SK NDigits threshold ~25
+  int  GetDefaultNDigitsPreTriggerWindow()  { return -1000;  } ///< Scintillator elements have much longer timescales
+  int  GetDefaultNDigitsPostTriggerWindow() { return 2000;   } ///< Scintillator elements have much longer timescales
+};
 
 #endif //WCSimWCTrigger_h

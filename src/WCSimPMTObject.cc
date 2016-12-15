@@ -74,9 +74,9 @@ PMT20inch::PMT20inch() {}
 PMT20inch::~PMT20inch(){}
 
 G4String PMT20inch::GetPMTName() {G4String PMTName = "20inch"; return PMTName;}
-G4double PMT20inch::GetExposeHeight() {return .18*m;}
-G4double PMT20inch::GetRadius() {return .254*m;}
-G4double PMT20inch::GetPMTGlassThickness() {return 0.4*cm;}
+G4double PMT20inch::GetExposeHeight() {return .18*CLHEP::m;}
+G4double PMT20inch::GetRadius() {return .254*CLHEP::m;}
+G4double PMT20inch::GetPMTGlassThickness() {return 0.4*CLHEP::cm;}
 float PMT20inch::HitTimeSmearing(float Q) {
   float timingConstant = 10.0; 
   float timingResolution = 0.33 + sqrt(timingConstant/Q); 
@@ -248,9 +248,9 @@ PMT8inch::PMT8inch(){}
 PMT8inch::~PMT8inch(){}
 
 G4String PMT8inch::GetPMTName() {G4String PMTName = "8inch"; return PMTName;}
-G4double PMT8inch::GetExposeHeight() {return 91.6*mm;}
-G4double PMT8inch::GetRadius() {return 101.6*mm;}
-G4double PMT8inch::GetPMTGlassThickness() {return 0.55*cm;} //currently the same as 10inch
+G4double PMT8inch::GetExposeHeight() {return 91.6*CLHEP::mm;}
+G4double PMT8inch::GetRadius() {return 101.6*CLHEP::mm;}
+G4double PMT8inch::GetPMTGlassThickness() {return 0.55*CLHEP::cm;} //currently the same as 10inch
 G4float PMT8inch::HitTimeSmearing(float Q) { 
   float timingConstant = 1.890; 
   float timingResolution = 0.33 + sqrt(timingConstant/Q); 
@@ -409,9 +409,9 @@ PMT10inch::PMT10inch(){}
 PMT10inch::~PMT10inch(){}
 
 G4String PMT10inch::GetPMTName() {G4String PMTName = "10inch"; return PMTName;}
-G4double PMT10inch::GetExposeHeight() {return 117.*mm;}
-G4double PMT10inch::GetRadius() {return 127.*mm;}
-G4double PMT10inch::GetPMTGlassThickness() {return 0.55*cm;}
+G4double PMT10inch::GetExposeHeight() {return 117.*CLHEP::mm;}
+G4double PMT10inch::GetRadius() {return 127.*CLHEP::mm;}
+G4double PMT10inch::GetPMTGlassThickness() {return 0.55*CLHEP::cm;}
 float PMT10inch::HitTimeSmearing(float Q) { 
   float timingConstant = 2.0; 
   float timingResolution = 0.33 + sqrt(timingConstant/Q); 
@@ -571,9 +571,9 @@ PMT10inchHQE::PMT10inchHQE() {}
 PMT10inchHQE::~PMT10inchHQE(){}
 
 G4String PMT10inchHQE::GetPMTName() {G4String PMTName = "10inch"; return PMTName;}
-G4double PMT10inchHQE::GetExposeHeight() {return 117.*mm;}
-G4double PMT10inchHQE::GetRadius() {return 127.*mm;}
-G4double PMT10inchHQE::GetPMTGlassThickness() {return 0.55*cm;}
+G4double PMT10inchHQE::GetExposeHeight() {return 117.*CLHEP::mm;}
+G4double PMT10inchHQE::GetRadius() {return 127.*CLHEP::mm;}
+G4double PMT10inchHQE::GetPMTGlassThickness() {return 0.55*CLHEP::cm;}
 G4float PMT10inchHQE::HitTimeSmearing(float Q) {
   float timingConstant = 2.0; 
   float timingResolution = 0.33 + sqrt(timingConstant/Q); 
@@ -733,9 +733,9 @@ PMT12inchHQE::PMT12inchHQE(){}
 PMT12inchHQE::~PMT12inchHQE(){}
 
 G4String PMT12inchHQE::GetPMTName() {G4String PMTName = "12inch"; return PMTName;}
-G4double PMT12inchHQE::GetExposeHeight() {return 118.*mm;}
-G4double PMT12inchHQE::GetRadius() {return 152.4*mm;}
-G4double PMT12inchHQE::GetPMTGlassThickness() {return 0.55*cm;}
+G4double PMT12inchHQE::GetExposeHeight() {return 118.*CLHEP::mm;}
+G4double PMT12inchHQE::GetRadius() {return 152.4*CLHEP::mm;}
+G4double PMT12inchHQE::GetPMTGlassThickness() {return 0.55*CLHEP::cm;}
 G4float PMT12inchHQE::HitTimeSmearing(float Q) {
   float timingConstant = 2.0; 
   float timingResolution = 0.33 + sqrt(timingConstant/Q); 
@@ -908,9 +908,9 @@ HPD20inchHQE::HPD20inchHQE(){}
 HPD20inchHQE::~HPD20inchHQE(){}
 
 G4String HPD20inchHQE::GetPMTName() {G4String PMTName = "HPD20inchHQE"; return PMTName;}
-G4double HPD20inchHQE::GetExposeHeight() {return .192*m;}
-G4double HPD20inchHQE::GetRadius() {return .254*m;}
-G4double HPD20inchHQE::GetPMTGlassThickness() {return 0.3*cm;}
+G4double HPD20inchHQE::GetExposeHeight() {return .192*CLHEP::m;}
+G4double HPD20inchHQE::GetRadius() {return .254*CLHEP::m;}
+G4double HPD20inchHQE::GetPMTGlassThickness() {return 0.3*CLHEP::cm;}
 float HPD20inchHQE::HitTimeSmearing(float Q) {
   G4float sig_param[4]={0.6718,0.1264,0.4450,11.87};
   G4float lambda_param[2]={0.3255,0.1142};
@@ -1087,9 +1087,9 @@ HPD12inchHQE::HPD12inchHQE(){}
 HPD12inchHQE::~HPD12inchHQE(){}
 
 G4String HPD12inchHQE::GetPMTName() {G4String PMTName = "HPD12inchHQE"; return PMTName;}
-G4double HPD12inchHQE::GetExposeHeight() {return 118.*mm;} //Assumed to be the same as the PMT12inchHQE.
-G4double HPD12inchHQE::GetRadius() {return 152.4*mm;} //12 inches
-G4double HPD12inchHQE::GetPMTGlassThickness() {return 0.3*cm;} 
+G4double HPD12inchHQE::GetExposeHeight() {return 118.*CLHEP::mm;} //Assumed to be the same as the PMT12inchHQE.
+G4double HPD12inchHQE::GetRadius() {return 152.4*CLHEP::mm;} //12 inches
+G4double HPD12inchHQE::GetPMTGlassThickness() {return 0.3*CLHEP::cm;} 
 float HPD12inchHQE::HitTimeSmearing(float Q) {
   G4float sig_param[4]={0.6718,0.1264,0.4450,11.87};
   G4float lambda_param[2]={0.3255,0.1142};
@@ -1274,9 +1274,9 @@ BoxandLine20inchHQE::BoxandLine20inchHQE(){}
 BoxandLine20inchHQE::~BoxandLine20inchHQE(){}
 
 G4String BoxandLine20inchHQE::GetPMTName() {G4String PMTName = "BoxandLine20inchHQE"; return PMTName;}
-G4double BoxandLine20inchHQE::GetExposeHeight() {return .18*m;}
-G4double BoxandLine20inchHQE::GetRadius() {return .254*m;}
-G4double BoxandLine20inchHQE::GetPMTGlassThickness() {return 0.4*cm;}
+G4double BoxandLine20inchHQE::GetExposeHeight() {return .18*CLHEP::m;}
+G4double BoxandLine20inchHQE::GetRadius() {return .254*CLHEP::m;}
+G4double BoxandLine20inchHQE::GetPMTGlassThickness() {return 0.4*CLHEP::cm;}
 
 float BoxandLine20inchHQE::HitTimeSmearing(float Q) {
   G4float sig_param[4]={0.6314,0.06260,0.5711,23.96};
@@ -1459,9 +1459,9 @@ BoxandLine12inchHQE::BoxandLine12inchHQE(){}
 BoxandLine12inchHQE::~BoxandLine12inchHQE(){}
 
 G4String BoxandLine12inchHQE::GetPMTName() {G4String PMTName = "BoxandLine12inchHQE"; return PMTName;}
-G4double BoxandLine12inchHQE::GetExposeHeight() {return 118.*mm;}
-G4double BoxandLine12inchHQE::GetRadius() {return 152.4*mm;}
-G4double BoxandLine12inchHQE::GetPMTGlassThickness() {return 0.4*cm;}
+G4double BoxandLine12inchHQE::GetExposeHeight() {return 118.*CLHEP::mm;}
+G4double BoxandLine12inchHQE::GetRadius() {return 152.4*CLHEP::mm;}
+G4double BoxandLine12inchHQE::GetPMTGlassThickness() {return 0.4*CLHEP::cm;}
 
 float BoxandLine12inchHQE::HitTimeSmearing(float Q) {
   G4float sig_param[4]={0.6314,0.06260,0.5711,23.96};
@@ -1632,3 +1632,343 @@ G4float BoxandLine12inchHQE::GetDarkRateConversionFactor(){
   const G4float factor = 1.126;
   return factor;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+// 2 inch Flat Faced
+
+FlatFacedPMT2inch::FlatFacedPMT2inch(){}
+FlatFacedPMT2inch::~FlatFacedPMT2inch(){}
+
+G4String FlatFacedPMT2inch::GetPMTName() {G4String PMTName = "FlatFaced2inch"; return PMTName;}
+G4double FlatFacedPMT2inch::GetRadius() {return 50.8*CLHEP::mm;}
+G4double FlatFacedPMT2inch::GetPMTGlassThickness() {return 0.3*CLHEP::cm;} // arbitrary
+G4double FlatFacedPMT2inch::GetGelThickness() { return 0.1*CLHEP::cm;}		
+G4double FlatFacedPMT2inch::GetShamferRadius() { return 5.08*CLHEP::mm; }	// arbitrary, 1/10th of radius
+G4double FlatFacedPMT2inch::GetExposeHeight() {
+	return (this->GetShamferRadius()+this->GetGelThickness()+0.01*cm);	// net thickness of the entire construction
+	// the 0.01 comes from requirement of union solid faces not to align - see WCSimConstructFlatFacedPMT.cc airdisk (ln 240)
+}
+G4float FlatFacedPMT2inch::HitTimeSmearing(float Q) { 
+  float timingConstant = 1.890; 
+  float timingResolution = 0.33 + sqrt(timingConstant/Q); 
+  // looking at SK's jitter function for 20" tubes
+  if (timingResolution < 0.58) timingResolution=0.58;
+  float Smearing_factor = G4RandGauss::shoot(0.0,timingResolution);
+  return Smearing_factor;
+}
+
+G4float* FlatFacedPMT2inch::Getqpe() //currently uses the same as 20inch
+   {
+  static G4float qpe0[501]= {
+    // 1
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000129, 0.000754, 0.004060, 0.028471,
+    // 2
+    0.068449, 0.115679, 0.164646, 0.203466, 0.235631,
+    0.262351, 0.282064, 0.303341, 0.320618, 0.338317,
+    0.357825, 0.371980, 0.385820, 0.398838, 0.413595,
+    0.428590, 0.444387, 0.461685, 0.482383, 0.502369,
+    0.520779, 0.540011, 0.559293, 0.579354, 0.599337,
+    0.619580, 0.639859, 0.659807, 0.679810, 0.699620,
+    0.718792, 0.737382, 0.755309, 0.772042, 0.788232,
+    0.803316, 0.817861, 0.831148, 0.844339, 0.855532,
+    0.866693, 0.876604, 0.886067, 0.894473, 0.902150,
+    0.909515, 0.915983, 0.922050, 0.927418, 0.932492,
+    // 3
+    0.936951, 0.940941, 0.944660, 0.948004, 0.951090,
+    0.953833, 0.956576, 0.958886, 0.961134, 0.963116,
+    0.964930, 0.966562, 0.968008, 0.969424, 0.970687,
+    0.971783, 0.972867, 0.973903, 0.974906, 0.975784,
+    0.976632, 0.977438, 0.978190, 0.978891, 0.979543,
+    0.980124, 0.980666, 0.981255, 0.981770, 0.982227,
+    0.982701, 0.983146, 0.983566, 0.983975, 0.984357,
+    0.984713, 0.985094, 0.985404, 0.985739, 0.986049,
+    0.986339, 0.986630, 0.986922, 0.987176, 0.987431,
+    0.987655, 0.987922, 0.988173, 0.988414, 0.988639,
+    // 4
+    0.988856, 0.989065, 0.989273, 0.989475, 0.989662,
+    0.989828, 0.990007, 0.990172, 0.990327, 0.990497,
+    0.990645, 0.990797, 0.990981, 0.991135, 0.991272,
+    0.991413, 0.991550, 0.991673, 0.991805, 0.991928,
+    0.992063, 0.992173, 0.992296, 0.992406, 0.992514,
+    0.992632, 0.992733, 0.992837, 0.992954, 0.993046,
+    0.993148, 0.993246, 0.993354, 0.993458, 0.993549,
+    0.993656, 0.993744, 0.993836, 0.993936, 0.994033,
+    0.994134, 0.994222, 0.994307, 0.994413, 0.994495,
+    0.994572, 0.994659, 0.994739, 0.994816, 0.994886,
+    // 5
+    0.994970, 0.995032, 0.995110, 0.995178, 0.995250,
+    0.995321, 0.995383, 0.995464, 0.995532, 0.995609,
+    0.995674, 0.995750, 0.995821, 0.995889, 0.995952,
+    0.996010, 0.996071, 0.996153, 0.996218, 0.996283,
+    0.996335, 0.996384, 0.996431, 0.996484, 0.996537,
+    0.996597, 0.996655, 0.996701, 0.996745, 0.996802,
+    0.996860, 0.996917, 0.996962, 0.997014, 0.997079,
+    0.997114, 0.997165, 0.997204, 0.997250, 0.997295,
+    0.997335, 0.997379, 0.997418, 0.997454, 0.997488,
+    0.997530, 0.997573, 0.997606, 0.997648, 0.997685,
+    // 6
+    0.997725, 0.997762, 0.997795, 0.997835, 0.997866,
+    0.997898, 0.997941, 0.997966, 0.997997, 0.998039,
+    0.998065, 0.998104, 0.998128, 0.998153, 0.998179,
+    0.998205, 0.998223, 0.998254, 0.998293, 0.998319,
+    0.998346, 0.998374, 0.998397, 0.998414, 0.998432,
+    0.998456, 0.998482, 0.998511, 0.998532, 0.998553,
+    0.998571, 0.998594, 0.998614, 0.998638, 0.998669,
+    0.998693, 0.998715, 0.998743, 0.998762, 0.998793,
+    0.998812, 0.998834, 0.998857, 0.998872, 0.998888,
+    0.998904, 0.998926, 0.998946, 0.998963, 0.998983,
+    // 7
+    0.999007, 0.999027, 0.999044, 0.999064, 0.999079,
+    0.999096, 0.999120, 0.999133, 0.999152, 0.999160,
+    0.999174, 0.999188, 0.999206, 0.999221, 0.999234,
+    0.999248, 0.999263, 0.999276, 0.999286, 0.999300,
+    0.999313, 0.999321, 0.999331, 0.999347, 0.999356,
+    0.999369, 0.999381, 0.999394, 0.999402, 0.999415,
+    0.999427, 0.999433, 0.999446, 0.999458, 0.999472,
+    0.999484, 0.999499, 0.999513, 0.999522, 0.999532,
+    0.999540, 0.999550, 0.999559, 0.999567, 0.999574,
+    0.999588, 0.999599, 0.999613, 0.999618, 0.999627,
+    // 8
+    0.999635, 0.999639, 0.999652, 0.999662, 0.999667,
+    0.999671, 0.999678, 0.999682, 0.999688, 0.999693,
+    0.999698, 0.999701, 0.999706, 0.999711, 0.999718,
+    0.999722, 0.999727, 0.999732, 0.999737, 0.999740,
+    0.999746, 0.999750, 0.999754, 0.999763, 0.999766,
+    0.999769, 0.999774, 0.999780, 0.999784, 0.999788,
+    0.999796, 0.999803, 0.999807, 0.999809, 0.999815,
+    0.999820, 0.999827, 0.999830, 0.999833, 0.999833,
+    0.999836, 0.999839, 0.999842, 0.999845, 0.999850,
+    0.999853, 0.999857, 0.999860, 0.999865, 0.999870,
+    // 9
+    0.999873, 0.999877, 0.999880, 0.999882, 0.999883,
+    0.999886, 0.999888, 0.999889, 0.999895, 0.999896,
+    0.999897, 0.999901, 0.999902, 0.999905, 0.999907,
+    0.999907, 0.999909, 0.999911, 0.999911, 0.999912,
+    0.999913, 0.999914, 0.999917, 0.999919, 0.999921,
+    0.999923, 0.999927, 0.999929, 0.999931, 0.999933,
+    0.999936, 0.999942, 0.999942, 0.999944, 0.999947,
+    0.999947, 0.999948, 0.999949, 0.999952, 0.999955,
+    0.999957, 0.999957, 0.999961, 0.999962, 0.999963,
+    0.999963, 0.999963, 0.999964, 0.999965, 0.999965,
+    // 10
+    0.999965, 0.999965, 0.999966, 0.999968, 0.999969,
+    0.999971, 0.999972, 0.999972, 0.999973, 0.999975,
+    0.999975, 0.999975, 0.999975, 0.999975, 0.999975,
+    0.999975, 0.999979, 0.999979, 0.999980, 0.999982,
+    0.999983, 0.999985, 0.999986, 0.999987, 0.999987,
+    0.999988, 0.999989, 0.999989, 0.999989, 0.999989,
+    0.999990, 0.999990, 0.999992, 0.999993, 0.999994,
+    0.999994, 0.999994, 0.999994, 0.999994, 0.999995,
+    0.999995, 0.999995, 0.999996, 0.999996, 0.999996,
+    0.999996, 0.999998, 0.999999, 1.000000, 1.000000,
+    // Dummy element for noticing if the loop reached the end of the array
+    0.0 
+  };
+   return qpe0;
+  }
+
+//Currenly the PMT QE info is the same as 20 inch.
+G4float* FlatFacedPMT2inch::GetQE(){
+  static G4float QE[20] = { 0.00, .0139, .0854, .169, .203, .206, .211, .202,.188, .167, .140, .116, .0806, .0432, .0265, .0146, .00756, .00508, .00158, 0.00};
+  static G4float FullEfficiency[2] = {1.00, 1.00};
+  //return FullEfficiency;
+  return QE;
+}
+G4float* FlatFacedPMT2inch::GetQEWavelength(){static G4float wavelength[20] = { 280., 300., 320., 340., 360., 380., 400., 420., 440., 460., 480., 500., 520., 540., 560., 580., 600., 620., 640., 660.};
+  static G4float fullrange[2] = {280, 660};
+  //return fullrange;
+  return wavelength;
+}
+
+G4float  FlatFacedPMT2inch::GetmaxQE(){
+  const G4float maxQE = 0.211;
+  const G4float fullQE = 1.00;
+  //return fullQE;
+  return maxQE;
+}
+
+G4float FlatFacedPMT2inch::GetDarkRate(){
+  const G4float rate = 4.2*CLHEP::kilohertz;   
+  return rate;
+}
+
+G4float FlatFacedPMT2inch::GetDarkRateConversionFactor(){
+  const G4float factor = 1.367;
+  return factor;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+// 4 inch Flat Faced
+
+FlatFacedPMT4inch::FlatFacedPMT4inch(){}
+FlatFacedPMT4inch::~FlatFacedPMT4inch(){}
+
+G4String FlatFacedPMT4inch::GetPMTName() {G4String PMTName = "FlatFaced4inch"; return PMTName;}
+G4double FlatFacedPMT4inch::GetRadius() {return 50.8*CLHEP::mm;}
+G4double FlatFacedPMT4inch::GetPMTGlassThickness() {return 0.2*CLHEP::cm;} //must be less than shamfer radius
+G4double FlatFacedPMT4inch::GetGelThickness() { return 0.1*CLHEP::cm;}	
+G4double FlatFacedPMT4inch::GetShamferRadius() { return 5.08*CLHEP::mm; }	// arbitrary, 1/10th of radius
+G4double FlatFacedPMT4inch::GetExposeHeight() {
+	return (this->GetShamferRadius()+this->GetGelThickness()+0.01*cm);	// net thickness of the entire construction
+	// the 0.01 comes from requirement of union solid faces not to align - see WCSimConstructFlatFacedPMT.cc airdisk (ln 240)
+}
+G4float FlatFacedPMT4inch::HitTimeSmearing(float Q) { 
+  float timingConstant = 1.890; 
+  float timingResolution = 0.33 + sqrt(timingConstant/Q); 
+  // looking at SK's jitter function for 20" tubes
+  if (timingResolution < 0.58) timingResolution=0.58;
+  float Smearing_factor = G4RandGauss::shoot(0.0,timingResolution);
+  return Smearing_factor;
+}
+
+G4float* FlatFacedPMT4inch::Getqpe() //currently uses the same as 20inch
+   {
+  static G4float qpe0[501]= {
+    // 1
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
+    0.000000, 0.000129, 0.000754, 0.004060, 0.028471,
+    // 2
+    0.068449, 0.115679, 0.164646, 0.203466, 0.235631,
+    0.262351, 0.282064, 0.303341, 0.320618, 0.338317,
+    0.357825, 0.371980, 0.385820, 0.398838, 0.413595,
+    0.428590, 0.444387, 0.461685, 0.482383, 0.502369,
+    0.520779, 0.540011, 0.559293, 0.579354, 0.599337,
+    0.619580, 0.639859, 0.659807, 0.679810, 0.699620,
+    0.718792, 0.737382, 0.755309, 0.772042, 0.788232,
+    0.803316, 0.817861, 0.831148, 0.844339, 0.855532,
+    0.866693, 0.876604, 0.886067, 0.894473, 0.902150,
+    0.909515, 0.915983, 0.922050, 0.927418, 0.932492,
+    // 3
+    0.936951, 0.940941, 0.944660, 0.948004, 0.951090,
+    0.953833, 0.956576, 0.958886, 0.961134, 0.963116,
+    0.964930, 0.966562, 0.968008, 0.969424, 0.970687,
+    0.971783, 0.972867, 0.973903, 0.974906, 0.975784,
+    0.976632, 0.977438, 0.978190, 0.978891, 0.979543,
+    0.980124, 0.980666, 0.981255, 0.981770, 0.982227,
+    0.982701, 0.983146, 0.983566, 0.983975, 0.984357,
+    0.984713, 0.985094, 0.985404, 0.985739, 0.986049,
+    0.986339, 0.986630, 0.986922, 0.987176, 0.987431,
+    0.987655, 0.987922, 0.988173, 0.988414, 0.988639,
+    // 4
+    0.988856, 0.989065, 0.989273, 0.989475, 0.989662,
+    0.989828, 0.990007, 0.990172, 0.990327, 0.990497,
+    0.990645, 0.990797, 0.990981, 0.991135, 0.991272,
+    0.991413, 0.991550, 0.991673, 0.991805, 0.991928,
+    0.992063, 0.992173, 0.992296, 0.992406, 0.992514,
+    0.992632, 0.992733, 0.992837, 0.992954, 0.993046,
+    0.993148, 0.993246, 0.993354, 0.993458, 0.993549,
+    0.993656, 0.993744, 0.993836, 0.993936, 0.994033,
+    0.994134, 0.994222, 0.994307, 0.994413, 0.994495,
+    0.994572, 0.994659, 0.994739, 0.994816, 0.994886,
+    // 5
+    0.994970, 0.995032, 0.995110, 0.995178, 0.995250,
+    0.995321, 0.995383, 0.995464, 0.995532, 0.995609,
+    0.995674, 0.995750, 0.995821, 0.995889, 0.995952,
+    0.996010, 0.996071, 0.996153, 0.996218, 0.996283,
+    0.996335, 0.996384, 0.996431, 0.996484, 0.996537,
+    0.996597, 0.996655, 0.996701, 0.996745, 0.996802,
+    0.996860, 0.996917, 0.996962, 0.997014, 0.997079,
+    0.997114, 0.997165, 0.997204, 0.997250, 0.997295,
+    0.997335, 0.997379, 0.997418, 0.997454, 0.997488,
+    0.997530, 0.997573, 0.997606, 0.997648, 0.997685,
+    // 6
+    0.997725, 0.997762, 0.997795, 0.997835, 0.997866,
+    0.997898, 0.997941, 0.997966, 0.997997, 0.998039,
+    0.998065, 0.998104, 0.998128, 0.998153, 0.998179,
+    0.998205, 0.998223, 0.998254, 0.998293, 0.998319,
+    0.998346, 0.998374, 0.998397, 0.998414, 0.998432,
+    0.998456, 0.998482, 0.998511, 0.998532, 0.998553,
+    0.998571, 0.998594, 0.998614, 0.998638, 0.998669,
+    0.998693, 0.998715, 0.998743, 0.998762, 0.998793,
+    0.998812, 0.998834, 0.998857, 0.998872, 0.998888,
+    0.998904, 0.998926, 0.998946, 0.998963, 0.998983,
+    // 7
+    0.999007, 0.999027, 0.999044, 0.999064, 0.999079,
+    0.999096, 0.999120, 0.999133, 0.999152, 0.999160,
+    0.999174, 0.999188, 0.999206, 0.999221, 0.999234,
+    0.999248, 0.999263, 0.999276, 0.999286, 0.999300,
+    0.999313, 0.999321, 0.999331, 0.999347, 0.999356,
+    0.999369, 0.999381, 0.999394, 0.999402, 0.999415,
+    0.999427, 0.999433, 0.999446, 0.999458, 0.999472,
+    0.999484, 0.999499, 0.999513, 0.999522, 0.999532,
+    0.999540, 0.999550, 0.999559, 0.999567, 0.999574,
+    0.999588, 0.999599, 0.999613, 0.999618, 0.999627,
+    // 8
+    0.999635, 0.999639, 0.999652, 0.999662, 0.999667,
+    0.999671, 0.999678, 0.999682, 0.999688, 0.999693,
+    0.999698, 0.999701, 0.999706, 0.999711, 0.999718,
+    0.999722, 0.999727, 0.999732, 0.999737, 0.999740,
+    0.999746, 0.999750, 0.999754, 0.999763, 0.999766,
+    0.999769, 0.999774, 0.999780, 0.999784, 0.999788,
+    0.999796, 0.999803, 0.999807, 0.999809, 0.999815,
+    0.999820, 0.999827, 0.999830, 0.999833, 0.999833,
+    0.999836, 0.999839, 0.999842, 0.999845, 0.999850,
+    0.999853, 0.999857, 0.999860, 0.999865, 0.999870,
+    // 9
+    0.999873, 0.999877, 0.999880, 0.999882, 0.999883,
+    0.999886, 0.999888, 0.999889, 0.999895, 0.999896,
+    0.999897, 0.999901, 0.999902, 0.999905, 0.999907,
+    0.999907, 0.999909, 0.999911, 0.999911, 0.999912,
+    0.999913, 0.999914, 0.999917, 0.999919, 0.999921,
+    0.999923, 0.999927, 0.999929, 0.999931, 0.999933,
+    0.999936, 0.999942, 0.999942, 0.999944, 0.999947,
+    0.999947, 0.999948, 0.999949, 0.999952, 0.999955,
+    0.999957, 0.999957, 0.999961, 0.999962, 0.999963,
+    0.999963, 0.999963, 0.999964, 0.999965, 0.999965,
+    // 10
+    0.999965, 0.999965, 0.999966, 0.999968, 0.999969,
+    0.999971, 0.999972, 0.999972, 0.999973, 0.999975,
+    0.999975, 0.999975, 0.999975, 0.999975, 0.999975,
+    0.999975, 0.999979, 0.999979, 0.999980, 0.999982,
+    0.999983, 0.999985, 0.999986, 0.999987, 0.999987,
+    0.999988, 0.999989, 0.999989, 0.999989, 0.999989,
+    0.999990, 0.999990, 0.999992, 0.999993, 0.999994,
+    0.999994, 0.999994, 0.999994, 0.999994, 0.999995,
+    0.999995, 0.999995, 0.999996, 0.999996, 0.999996,
+    0.999996, 0.999998, 0.999999, 1.000000, 1.000000,
+    // Dummy element for noticing if the loop reached the end of the array
+    0.0 
+  };
+   return qpe0;
+  }
+
+//Currenly the PMT QE info is the same as 20 inch.
+G4float* FlatFacedPMT4inch::GetQE(){
+  static G4float QE[20] = { 0.00, .0139, .0854, .169, .203, .206, .211, .202,.188, .167, .140, .116, .0806, .0432, .0265, .0146, .00756, .00508, .00158, 0.00};
+  return QE;
+}
+G4float* FlatFacedPMT4inch::GetQEWavelength(){static G4float wavelength[20] = { 280., 300., 320., 340., 360., 380., 400., 420., 440., 460., 480., 500., 520., 540., 560., 580., 600., 620., 640., 660.};
+  return wavelength;}
+
+G4float  FlatFacedPMT4inch::GetmaxQE(){
+    const G4float maxQE = 0.211;
+  return maxQE;
+}
+
+G4float FlatFacedPMT4inch::GetDarkRate(){
+  const G4float rate = 4.2*CLHEP::kilohertz;   
+  return rate;
+}
+
+G4float FlatFacedPMT4inch::GetDarkRateConversionFactor(){
+  const G4float factor = 1.367;
+  return factor;
+}
+

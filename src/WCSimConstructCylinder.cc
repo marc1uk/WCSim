@@ -6,6 +6,7 @@
 #include "G4Box.hh"
 #include "G4Tubs.hh"
 #include "G4UnionSolid.hh"
+#include "G4Torus.hh"
 #include "G4Sphere.hh"
 #include "G4Trd.hh"
 #include "G4IntersectionSolid.hh"
@@ -76,14 +77,20 @@ G4LogicalVolume* WCSimDetectorConstruction::ConstructCylinder()
   outerAnnulusRadius = WCIDRadius + WCBlackSheetThickness + 1.*mm;//+ Stealstructure etc.
   // the radii are measured to the center of the surfaces
   // (tangent distance). Thus distances between the corner and the center are bigger.
-  WCLength    = WCIDHeight + 2*2.3*m;	//jl145 - reflects top veto blueprint, cf. Farshid Feyzi
-  WCRadius    = (WCIDDiameter/2. + WCBlackSheetThickness + 1.5*m)/cos(dPhi/2.) ; // TODO: OD 
+  
+  //WCLength    = WCIDHeight + 2*2.3*m;	//jl145 - reflects top veto blueprint, cf. Farshid Feyzi
+  //WCRadius    = (WCIDDiameter/2. + WCBlackSheetThickness + 1.5*m)/cos(dPhi/2.) ; // TODO: OD 
+  // modify for ANNIE - much more compact, smaller excess <<< this accounts for extra volume around PMT faces!
+  WCLength    = WCIDHeight + 5.*cm;	// arbitrary additional space?
+  //WCRadius    = (WCIDDiameter/2. + WCBlackSheetThickness + 20*cm)/cos(dPhi/2.); 
+  // this is known - set in DetectorConfigs
+  
  
-  // now we know the extend of the detector and are able to tune the tolerance
-  G4GeometryManager::GetInstance()->SetWorldMaximumExtent(WCLength > WCRadius ? WCLength : WCRadius);
-  G4cout << "Computed tolerance = "
-         << G4GeometryTolerance::GetInstance()->GetSurfaceTolerance()/mm
-         << " mm" << G4endl;
+//  // now we know the extend of the detector and are able to tune the tolerance
+//  G4GeometryManager::GetInstance()->SetWorldMaximumExtent(WCLength > WCRadius ? WCLength : WCRadius);
+//  G4cout << "Computed tolerance = "
+//         << G4GeometryTolerance::GetInstance()->GetSurfaceTolerance()/mm
+//         << " mm" << G4endl;
 
   //Decide if adding Gd
   water = "Water";
@@ -97,10 +104,17 @@ G4LogicalVolume* WCSimDetectorConstruction::ConstructCylinder()
 
   // The water barrel is placed in an tubs of air
   
+//  G4Tubs* solidWC = new G4Tubs("WC",
+//			       0.0*m,
+//			       WCRadius+2.*m, 
+//			       .5*WCLength+4.2*m,	//jl145 - per blueprint
+//			       0.*deg,
+//			       360.*deg);
+
   G4Tubs* solidWC = new G4Tubs("WC",
 			       0.0*m,
-			       WCRadius+2.*m, 
-			       .5*WCLength+4.2*m,	//jl145 - per blueprint
+			       WCRadius+2.*cm,
+			       .5*WCLength+2.*cm,	// smaller excess for ANNIE
 			       0.*deg,
 			       360.*deg);
   
@@ -110,21 +124,27 @@ G4LogicalVolume* WCSimDetectorConstruction::ConstructCylinder()
 			"WC",
 			0,0,0);
  
- 
    G4VisAttributes* showColor = new G4VisAttributes(G4Colour(0.0,1.0,0.0));
    logicWC->SetVisAttributes(showColor);
 
-   logicWC->SetVisAttributes(G4VisAttributes::Invisible); //amb79
+   //logicWC->SetVisAttributes(G4VisAttributes::Invisible); //amb79
   
   //-----------------------------------------------------
   // everything else is contained in this water tubs
   //-----------------------------------------------------
+//  G4Tubs* solidWCBarrel = new G4Tubs("WCBarrel",
+//				     0.0*m,
+//				     WCRadius+1.*m, // add a bit of extra space
+//				     .5*WCLength,  //jl145 - per blueprint
+//				     0.*deg,
+//				     360.*deg);
+				     
   G4Tubs* solidWCBarrel = new G4Tubs("WCBarrel",
-				     0.0*m,
-				     WCRadius+1.*m, // add a bit of extra space
-				     .5*WCLength,  //jl145 - per blueprint
-				     0.*deg,
-				     360.*deg);
+  				     0.0*m,
+  				     WCRadius,		// why excess here?
+  				     0.5*WCLength,
+  				     0.*deg,
+  				     360.*deg);
   
   G4LogicalVolume* logicWCBarrel = 
     new G4LogicalVolume(solidWCBarrel,
@@ -618,14 +638,13 @@ else {
   //-----------------------------------------------------
   // The PMT
   //-----------------------------------------------------
-
+  
   ////////////J Felde: The PMT logical volume is now constructed separately 
   // from any specific detector geometry so that any geometry can use the same definition. 
   // K.Zbiri: The PMT volume and the PMT glass are now put in parallel. 
   // The PMT glass is the sensitive volume in this new configuration.
 
-  G4LogicalVolume* logicWCPMT = ConstructPMT(WCPMTName, WCIDCollectionName);
-
+  G4LogicalVolume* logicWCPMT = ConstructPMT(WCPMTName, WCIDCollectionName, "tank");
 
   /*These lines of code will give color and volume to the PMTs if it hasn't been set in WCSimConstructPMT.cc.
 I recommend setting them in WCSimConstructPMT.cc. 
@@ -1182,7 +1201,7 @@ G4LogicalVolume* WCSimDetectorConstruction::ConstructCaps(G4int zflip)
   // Add top and bottom PMTs
   // -----------------------------------------------------
   
-	G4LogicalVolume* logicWCPMT = ConstructPMT(WCPMTName, WCIDCollectionName);
+	G4LogicalVolume* logicWCPMT = ConstructPMT(WCPMTName, WCIDCollectionName, "tank");
 	
 	// If using RayTracer and want to view the detector without caps, comment out the top and bottom PMT's
 

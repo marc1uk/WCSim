@@ -18,6 +18,21 @@
 // warning : hash_map is not part of the standard
 #include <ext/hash_map>
 
+// **************SciBooNE integration
+#include "G4UserLimits.hh"
+#include "G4PVPlacement.hh"
+#include "G4SubtractionSolid.hh"
+#include "G4AssemblyVolume.hh"
+#include "G4Material.hh"
+#include "G4Box.hh"
+#include "G4Tubs.hh"
+#include "G4Polyhedra.hh"
+#include "G4Trd.hh"
+#include "G4SystemOfUnits.hh"
+static const G4double INCH = 2.54*cm;
+// *************/SciBooNE integration
+
+
 
 using __gnu_cxx::hash;
 using __gnu_cxx::hashtable;
@@ -67,16 +82,20 @@ public:
   void Cylinder_12inchHPD_15perCent();
   void SetHyperKGeometry();
   void UpdateGeometry();
+  void SetANNIEPhase1Geometry(); //phase 1 geometry - just 60 PMTs on bottom, with NCV.
+  void SetANNIEPhase2Geometry(); // phase 2 geometry - 60 PMTs on bottom, top, and 200 PMTs around barrel.
   
 
   G4String GetDetectorName()      {return WCDetectorName;}
   G4double GetWaterTubeLength()   {return WCLength;}
   G4double GetWaterTubePosition() {return WCPosition;}
   G4double GetPMTSize()           {return WCPMTRadius;}
-  G4String GetPMTName()			  {return WCPMTName;}
+  G4String GetPMTName()           {return WCPMTName;}
   G4int    GetMyConfiguration()   {return myConfiguration;}
   G4double GetGeo_Dm(G4int);
   G4int    GetTotalNumPmts() {return totalNumPMTs;}
+  G4int    GetTotalNumMrdPmts() {return totalNumMrdPMTs;}
+  G4int    GetTotalNumFaccPmts() {return totalNumFaccPMTs;}
   
   G4int    GetPMT_QE_Method(){return PMT_QE_Method;}
   G4double GetwaterTank_Length() {return waterTank_Length;} 
@@ -107,6 +126,12 @@ public:
   // Related to the WC tube ID
   static G4int GetTubeID(std::string tubeTag){return tubeLocationMap[tubeTag];}
   static G4Transform3D GetTubeTransform(int tubeNo){return tubeIDMap[tubeNo];}
+  // MRD tube ID
+  static G4int GetMrdTubeID(std::string tubeTag){return mrdtubeLocationMap[tubeTag];}
+  static G4Transform3D GetMrdTubeTransform(int tubeNo){return mrdtubeIDMap[tubeNo];}
+  // FACC tube ID
+  static G4int GetFaccTubeID(std::string tubeTag){return facctubeLocationMap[tubeTag];}
+  static G4Transform3D GetFaccTubeTransform(int tubeNo){return facctubeIDMap[tubeNo];}
 
   // Related to Pi0 analysis
   G4bool SavePi0Info()              {return pi0Info_isSaved;}
@@ -166,7 +191,8 @@ private:
 
   // The Construction routines
   G4LogicalVolume*   ConstructCylinder();
-  G4LogicalVolume* ConstructPMT(G4String,G4String);
+  G4LogicalVolume* ConstructPMT(G4String,G4String, G4String detectorElement="tank");
+  G4LogicalVolume* ConstructFlatFacedPMT(G4String PMTName, G4String CollectionName, G4String detectorElement="mrd");
 
   G4LogicalVolume* ConstructCaps(G4int zflip);
 
@@ -395,6 +421,283 @@ private:
   G4double innerradius;
  
   std::vector<WCSimPmtInfo*> fpmts;
+  
+  // MRD & Veto variables
+  // ====================================================
+  public:
+  G4LogicalVolume* ConstructANNIE();
+  void DefineMRD(G4PVPlacement* expHall);
+  void DefineANNIEdimensions();
+  void AddANNIEPhase1PMTs(G4LogicalVolume* waterTank_log);
+  void AddANNIEPhase2PMTs(G4LogicalVolume* waterTank_log);
+  void ConstructMRD(G4LogicalVolume* expHall_log, G4VPhysicalVolume* expHall_phys);
+  void ConstructVETO(G4LogicalVolume* expHall_log, G4VPhysicalVolume* expHall_phys);
+  void ConstructNCV(G4LogicalVolume* waterTank_log);
+  void ComputePaddleTransformation (const G4int copyNo, G4VPhysicalVolume* physVol);
+  void ComputeTaperTransformation (const G4int copyNo, G4VPhysicalVolume* physVol, G4int selector, G4bool additionaloffset);
+  void ComputeSteelTransformation (const G4int copyNo, G4VPhysicalVolume* physVol);
+  void ComputeVetoPaddleTransformation (const G4int copyNo, G4VPhysicalVolume* physVol, G4int selector);
+  void PlacePaddles(G4LogicalVolume* totMRD_log);
+  void PlaceTapers(G4LogicalVolume* totMRD_log);
+  void PlaceLGs(G4LogicalVolume* totMRD_log);
+  void PlaceMRDSDSurfs(G4LogicalVolume* totMRD_log);
+  void PlaceMRDPMTs(G4LogicalVolume* totMRD_log);
+  void PlaceMylarOnMRDPaddles(G4VPhysicalVolume* expHall_phys, G4VPhysicalVolume* totMRD_phys);
+  void PlaceSteels(G4LogicalVolume* totMRD_log);
+  void makeAlu(G4AssemblyVolume* totMRD);
+  void PlaceVetoPaddles(G4LogicalVolume* totVeto_log);
+  void PlaceVetoLGs(G4LogicalVolume* totVeto_log);
+  void PlaceVetoSDsurfs(G4LogicalVolume* totVeto_log);
+  void PlaceVetoPMTs(G4LogicalVolume* totVeto_log);
+  void PlaceMylarOnFACCPaddles(G4VPhysicalVolume* expHall_phys, G4VPhysicalVolume* totVeto_phys);
+  G4String GetMRDPMTName()			  {return MRDPMTName;}
+  G4String GetFACCPMTName()			  {return FACCPMTName;}
+  G4String GetMRDCollectionName(){return WCMRDCollectionName;}
+  G4String GetFACCCollectionName(){return WCFACCCollectionName;}
+//  private:
+
+  G4bool isANNIE;
+  G4String GDMLFilename;
+  G4double tankouterRadius;
+  G4double tankhy;
+  G4double tankzoffset;
+  G4double tankyoffset;
+  G4double expHall_x;
+  G4double expHall_y;
+  G4double expHall_z;
+  G4int doOverlapCheck;
+  
+  G4String WCMRDCollectionName;
+  G4String WCFACCCollectionName;
+  G4String MRDPMTName;
+  G4double MRDPMTExposeHeight;
+  G4double MRDPMTRadius;
+  G4String FACCPMTName;
+  G4double FACCPMTExposeHeight;
+  G4double FACCPMTRadius;
+  WCSimWCSD* afacc;
+  WCSimWCSD* aMRDPMT;
+  
+  // info for map of PMT locations
+  G4int totalNumMrdPMTs;
+  G4int totalNumFaccPMTs;
+  static std::map<int, G4Transform3D> mrdtubeIDMap; 
+  static std::map<int, G4Transform3D> facctubeIDMap;
+  static hash_map<std::string, int, hash<std::string> > mrdtubeLocationMap;
+  static hash_map<std::string, int, hash<std::string> > facctubeLocationMap; 
+  std::vector<WCSimPmtInfo*> fmrdpmts, ffaccpmts;
+  std::vector<WCSimPmtInfo*>* Get_MrdPmts() {return &fmrdpmts;}
+  std::vector<WCSimPmtInfo*>* Get_FaccPmts() {return &ffaccpmts;}
+  
+	G4double Xposition, Yposition, Zposition;		// used for positioning parameterisations.
+	G4int numpaddlesperpanelh;									// paddles per h scintillator panel
+	G4int numpaddlesperpanelv;									// paddles per v scintillator panel
+	G4int numpanels;														// scintillator panels
+	G4int numhpanels;														// horizontal scintillator panels
+	G4int numvpanels;														// vertical scintillator panels
+	G4int numrpcs;															// rpc panels
+	G4int numplates;														// steel plates
+	G4int numalustructs;												// number of supporting structs. We may be dropping one as we have fewer scintillators?
+	G4int numvetopaddles;												// number of scintillator paddles in the FACC; 13 panels in 2 layers
+	G4int vetopaddlesperpanel;									// number of scintillator paddles in each FACC panel
+
+	G4double scintbordergap;										// gap between each scintillator (cm) (border to account for cladding etc)
+	G4double steelscintgap;											// gap between steel and scintillator
+	G4double scintalugap;												// gap between scintillator and alu struct
+	G4double alusteelgap; 											// gap between alu struct and subsequent steel of next layer
+	G4double layergap;													// total gaps of layers
+
+	G4double steelfullxlen;
+	G4double steelfullylen;
+	G4double steelfullzlen;
+
+	G4double scintfullxlen;
+	G4double scintfullzlen;
+	G4double scinthfullylen;
+	G4double scintvfullylen;
+
+	G4double scinttapfullwidth; 								// width of the tapering part of scintillator paddles at the narrow end
+	G4double scinttapfullheight; 								// z length of tapering part of scint paddles.
+
+	G4double scintlgfullwidth; 									// tapered light guides at narrow end
+	G4double scintlgfullheight;
+
+	G4double alufullxlen;												// outer thicknesses - total frame dims are about those of the steel plate
+	G4double alufullylen;												// 
+	G4double alufullzlen;												// 
+	G4double alufullxthickness;									// 
+	G4double alufullythickness;
+	G4double windowwidth;												// (full length - 4 beams) / 3 windows
+	G4double windowheight;
+	
+	G4double mrdpmtfullheight;									// full length of MRD PMTs
+
+	G4double mrdZlen; 
+
+	G4double vetopaddlefullxlen;
+	G4double vetopaddlefullylen;
+	G4double vetopaddlefullzlen;
+	G4double vetolayer2offset;
+	G4double vetopaddlegap;
+	G4double nothickness;
+	
+	G4double vetolgfullxlen;								// width of the veto light guides at narrow end
+	G4double vetolgfullylen;
+	
+	G4double vetopmtfullheight;
+
+	G4double vetoZlen;
+
+	G4double maxwidth;
+	G4double maxheight;
+	G4double mrdZoffset;
+
+	// Define solids 
+	//==============  
+	// G4Box* variableName = new G4Box("SolidName", x_halflength, y_halflength, z_halflength);
+	// G4Trd("SolidName", x_halflength1, x_halflength2, y_halflength1, y_halflength2, z_halflength); 
+	// 2 x and y dimensions given - define dims of the cross-sections at the two z ends. 
+
+	G4Box* sciMRDhpaddle_box;										// Paddles - h 
+	G4Box* sciMRDvpaddle_box;										// and v
+	G4Trd* mrdScintTap_box;											// Paddle Tapered ends
+
+	G4Trd* mrdLG_box;														// Tapered Light Guides
+	G4Box* mrdSurface_box;											// little box for surface to detect photons
+
+	G4Box* steelMRDplate_box;										// Steel plates
+
+	G4Box* aluMRDstruc_box;											// The alu support structure is roughly the external size of the steel plates...
+	G4Box* aluMRDwindow_box;										// with a 3x3 grid of ~even sized holes  
+
+	G4Box* totMRD_box;
+
+	G4Box* vetoPaddle_box;
+	G4Box* vetoSurface_box;
+	G4Box* totVeto_box;
+	G4Trd* vetoLG_box;
+	
+	
+	// Define logical volumes 
+	//=======================
+	// G4LogicalVolume* variableName = new G4LogicalVolume(solidVariableName, Material, "logicalVolName");
+	// Can't do this outside a function - the materials aren't defined yet.
+
+	G4LogicalVolume* hpaddle_log;
+	G4LogicalVolume* vpaddle_log;
+	G4LogicalVolume* taper_log;
+	G4LogicalVolume* lg_log;
+	G4LogicalVolume* steel_log;
+	G4LogicalVolume* mrdsdsurf_log;
+
+	G4LogicalVolume* vetoPaddle_log;
+	G4LogicalVolume* vetol2Paddle_log;
+	G4LogicalVolume* vetoSurface_log;
+	G4LogicalVolume* vetolg_log;
+	
+	G4LogicalVolume* logicMRDPMT;
+	G4LogicalVolume* logicFACCPMT;
+	
+	G4OpticalSurface* scintSurface_op;	// mylar reflective surface
+	G4OpticalSurface* lgSurface_op;			// optical surface with efficiency of detection defined, for boundary detection on ends of LGs
+
+	// Physical Volumes
+	// ================
+	// to place optical surface between tapers and LGs for optical detection we need pointers to the physical volumes
+	// declare containers for the pointers here, they'll be filled by the placement function.
+	std::vector<G4VPhysicalVolume*> paddles_phys;
+	std::vector<G4VPhysicalVolume*> tapers_phys;
+	std::vector<G4VPhysicalVolume*> lgs_phys;
+	std::vector<G4VPhysicalVolume*> mrdsdsurfs_phys;
+	std::vector<G4VPhysicalVolume*> vetopaddles_phys;
+	std::vector<G4VPhysicalVolume*> vetosurfaces_phys;
+	std::vector<G4VPhysicalVolume*> vetolgs_phys;
+
+	// Define rotation matrices 
+	//=========================
+	// rotated and unrotated scintillator paddles. Could do away with one by changing dims but hey.
+	G4RotationMatrix* noRot;										// null rotation pointer
+	G4RotationMatrix* rotatedmatx;							// horizontal config for scint paddles
+
+	// Note trapezium narrows along z axis, so need to define a rotation of 90deg about the y(??)-axis to bring taper into the x-y plane. 
+	G4RotationMatrix* upmtx;
+	G4RotationMatrix* downmtx;
+	G4RotationMatrix* rightmtx;
+	G4RotationMatrix* leftmtx;
+
+	// Define Visualisation Attributes 
+	//================================
+	G4VisAttributes* scinthatts;
+	G4VisAttributes* scintvatts;
+	G4VisAttributes* steelatts;
+	G4VisAttributes* scinttapatts;
+	G4VisAttributes* scintlgatts;
+	G4VisAttributes* senssurfatts;
+	
+  // End MRD & Veto variables
+  // ====================================================
+  
+  public:
+    // ****************SciBooNE integration
+    int startindex;
+    G4bool useadditionaloffset;
+    
+    G4Material *Air, *Al, *Fe, *Pb;
+    G4Material *Steel, *Scinti, *Lucite;
+    G4Material *ECScinti, *MRDIron;
+    G4Material *Plywood;
+    
+//		// for MRD
+//		G4VSolid *MRDIron_Solid[12];
+//		G4VSolid *MRDVScinti_Solid, *MRDHScinti_Solid;
+//		G4VSolid *MRDTScinti_Solid;
+//		G4VSolid *MRDLG_Solid;
+
+//		G4LogicalVolume *MRDIron_LV[12];
+//		G4LogicalVolume *MRDVScinti_LV, *MRDHScinti_LV;
+//		G4LogicalVolume *MRDTScinti_LV;
+//		G4LogicalVolume *MRDLG_LV;
+
+//		// for MRD Al support
+//		G4SubtractionSolid *MRDAlV1_Solid;
+//		G4SubtractionSolid *MRDAlV2_Solid;
+//		G4SubtractionSolid *MRDAlV3_Solid;
+//		G4SubtractionSolid *MRDAlV4_Solid;
+//		G4SubtractionSolid *MRDAlV5_Solid;
+//		G4SubtractionSolid *MRDAlH1_Solid;
+//		G4SubtractionSolid *MRDAlH2_Solid;
+//		G4SubtractionSolid *MRDAlH3_Solid;
+
+//		G4VSolid *MRDAlV1_Outer;
+//		G4VSolid *MRDAlV2_Outer;
+//		G4VSolid *MRDAlV3_Outer;
+//		G4VSolid *MRDAlV4_Outer;
+//		G4VSolid *MRDAlV5_Outer;
+//		G4VSolid *MRDAlH1_Outer;
+//		G4VSolid *MRDAlH2_Outer;
+//		G4VSolid *MRDAlH3_Outer;
+
+//		G4VSolid *MRDAlV1_Inner;
+//		G4VSolid *MRDAlV2_Inner;
+//		G4VSolid *MRDAlV3_Inner;
+//		G4VSolid *MRDAlV4_Inner;
+//		G4VSolid *MRDAlV5_Inner;
+//		G4VSolid *MRDAlH1_Inner;
+//		G4VSolid *MRDAlH2_Inner;
+//		G4VSolid *MRDAlH3_Inner;
+
+//		G4LogicalVolume *MRDAlV1_LV;
+//		G4LogicalVolume *MRDAlV2_LV;
+//		G4LogicalVolume *MRDAlV3_LV;
+//		G4LogicalVolume *MRDAlV4_LV;
+//		G4LogicalVolume *MRDAlV5_LV;
+//		G4LogicalVolume *MRDAlH1_LV;
+//		G4LogicalVolume *MRDAlH2_LV;
+//		G4LogicalVolume *MRDAlH3_LV;
+
+//		G4AssemblyVolume * MRDAlSupportV;
+//		G4AssemblyVolume * MRDAlSupportH;
+//    // *********/SciBooNE integration
   
 };
 

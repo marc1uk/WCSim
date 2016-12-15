@@ -40,6 +40,8 @@
 #/WCSim/EggShapedHyperK/waterTank_Length 123750. mm # Equivalent length for 2 partitions
 #/WCSim/EggShapedHyperK/waterTank_Length 247500. mm # Equivalent length for 1 partition
 
+# switch geometry to ANNIE
+/WCSim/WCgeom ANNIEp2
 
 #/WCSim/Construct # This must be uncommented in order to construct a new detector configuration. 
 
@@ -98,6 +100,19 @@
 #/DarkRate/SetDarkMode 1 adds dark noise hits to a window of
 #width /DarkRate/SetDarkWindow [time in ns] around each hit
 #i.e. hit time ± (/DarkRate/SetDarkWindow) / 2
+/DarkRate/SetDetectorElement tank
+/DarkRate/SetDarkMode 1
+/DarkRate/SetDarkHigh 100000
+/DarkRate/SetDarkLow 0
+/DarkRate/SetDarkWindow 4000
+
+/DarkRate/SetDetectorElement mrd
+/DarkRate/SetDarkMode 1
+/DarkRate/SetDarkHigh 100000
+/DarkRate/SetDarkLow 0
+/DarkRate/SetDarkWindow 4000
+
+/DarkRate/SetDetectorElement facc
 /DarkRate/SetDarkMode 1
 /DarkRate/SetDarkHigh 100000
 /DarkRate/SetDarkLow 0

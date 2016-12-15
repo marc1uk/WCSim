@@ -69,15 +69,20 @@ void WCSimRunAction::BeginOfRunAction(const G4Run* /*aRun*/)
 
   SetTree(tree);
   wcsimrootsuperevent = new WCSimRootEvent(); //empty list
+  wcsimrootsuperevent_mrd = new WCSimRootEvent();
+  wcsimrootsuperevent_facc = new WCSimRootEvent();
   //  wcsimrootsuperevent->AddSubEvent(); // make at least one event
   wcsimrootsuperevent->Initialize(); // make at least one event
+  wcsimrootsuperevent_mrd->Initialize();
+  wcsimrootsuperevent_facc->Initialize();
   Int_t branchStyle = 1; //new style by default
   TTree::SetBranchStyle(branchStyle);
   Int_t bufsize = 64000;
-
   //  TBranch *branch = tree->Branch("wcsimrootsuperevent", "Jhf2kmrootsuperevent", &wcsimrootsuperevent, bufsize,0);
-  TBranch *branch = tree->Branch("wcsimrootevent", "WCSimRootEvent", &wcsimrootsuperevent, bufsize,2);
-
+  wcsimrooteventbranch = tree->Branch("wcsimrootevent", "WCSimRootEvent", &wcsimrootsuperevent, bufsize,2);
+  wcsimrooteventbranch_mrd = tree->Branch("wcsimrootevent_mrd", "WCSimRootEvent", &wcsimrootsuperevent_mrd, bufsize,2);
+  wcsimrooteventbranch_facc = tree->Branch("wcsimrootevent_facc", "WCSimRootEvent", &wcsimrootsuperevent_facc, bufsize,2);
+  
   // Geometry tree
 
   geoTree = new TTree("wcsimGeoT","WCSim Geometry Tree");
@@ -111,6 +116,8 @@ void WCSimRunAction::EndOfRunAction(const G4Run*)
   // is taken care of by the file close
 
   delete wcsimrootsuperevent; wcsimrootsuperevent=0;
+  delete wcsimrootsuperevent_mrd; wcsimrootsuperevent_mrd=0;
+  delete wcsimrootsuperevent_facc; wcsimrootsuperevent_facc=0;
   delete wcsimrootgeom; wcsimrootgeom=0;
 
 }

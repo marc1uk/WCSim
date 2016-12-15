@@ -15,12 +15,17 @@
 #include "G4RunManager.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include "G4LogicalVolumeStore.hh"
+#include "WCSimDarkRateMessenger.hh"
 #include "G4SolidStore.hh"
+#include "G4GDMLParser.hh"
 
 std::map<int, G4Transform3D> WCSimDetectorConstruction::tubeIDMap;
+std::map<int, G4Transform3D> WCSimDetectorConstruction::mrdtubeIDMap;
+std::map<int, G4Transform3D> WCSimDetectorConstruction::facctubeIDMap;
 //std::map<int, cyl_location>  WCSimDetectorConstruction::tubeCylLocation;
-hash_map<std::string, int, hash<std::string> > 
-WCSimDetectorConstruction::tubeLocationMap;
+hash_map<std::string, int, hash<std::string> > WCSimDetectorConstruction::tubeLocationMap;
+hash_map<std::string, int, hash<std::string> > WCSimDetectorConstruction::mrdtubeLocationMap;
+hash_map<std::string, int, hash<std::string> > WCSimDetectorConstruction::facctubeLocationMap;
 
 WCSimDetectorConstruction::WCSimDetectorConstruction(G4int DetConfig,WCSimTuningParameters* WCSimTuningPars):WCSimTuningParams(WCSimTuningPars)
 {
@@ -44,17 +49,25 @@ WCSimDetectorConstruction::WCSimDetectorConstruction(G4int DetConfig,WCSimTuning
   //-----------------------------------------------------
 
   WCSimDetectorConstruction::tubeIDMap.clear();
+  WCSimDetectorConstruction::mrdtubeIDMap.clear();
+  WCSimDetectorConstruction::facctubeIDMap.clear();
   //WCSimDetectorConstruction::tubeCylLocation.clear();// (JF) Removed
   WCSimDetectorConstruction::tubeLocationMap.clear();
+  WCSimDetectorConstruction::mrdtubeLocationMap.clear();
+  WCSimDetectorConstruction::facctubeLocationMap.clear();
   WCSimDetectorConstruction::PMTLogicalVolumes.clear();
   totalNumPMTs = 0;
+  totalNumMrdPMTs = 0;
+  totalNumFaccPMTs = 0;
   WCPMTExposeHeight= 0.;
   //-----------------------------------------------------
   // Set the default WC geometry.  This can be changed later.
   //-----------------------------------------------------
 
-  SetSuperKGeometry();
+  //SetSuperKGeometry();
   //SetHyperKGeometry();
+  //SetANNIEPhase1Geometry();
+  SetANNIEPhase2Geometry();
 
   //----------------------------------------------------- 
   // Set whether or not Pi0-specific info is saved
@@ -99,6 +112,14 @@ WCSimDetectorConstruction::~WCSimDetectorConstruction(){
     delete fpmts.at(i);
   }
   fpmts.clear();
+  for (unsigned int i=0;i<fmrdpmts.size();i++){
+    delete fmrdpmts.at(i);
+  }
+  fmrdpmts.clear();
+    for (unsigned int i=0;i<ffaccpmts.size();i++){
+    delete ffaccpmts.at(i);
+  }
+  ffaccpmts.clear();
 }
 
 G4VPhysicalVolume* WCSimDetectorConstruction::Construct()
@@ -113,6 +134,8 @@ G4VPhysicalVolume* WCSimDetectorConstruction::Construct()
   WCSimDetectorConstruction::PMTLogicalVolumes.clear();
 
   totalNumPMTs = 0;
+  totalNumMrdPMTs = 0;
+  totalNumFaccPMTs = 0;
   
   //-----------------------------------------------------
   // Create Logical Volumes
@@ -126,9 +149,9 @@ G4VPhysicalVolume* WCSimDetectorConstruction::Construct()
   G4LogicalVolume* logicWCBox;
   // Select between egg-shaped HyperK and cylinder
   if (isEggShapedHyperK) logicWCBox = ConstructEggShapedHyperK();
+  else if (isANNIE) logicWCBox = ConstructANNIE();
   else logicWCBox = ConstructCylinder();
-
-  G4cout << " WCLength       = " << WCLength/m << " m"<< G4endl;
+  G4cout << " WCLength       = " << WCLength/CLHEP::m << " m"<< G4endl;
 
   //-------------------------------
 
@@ -137,7 +160,7 @@ G4VPhysicalVolume* WCSimDetectorConstruction::Construct()
 
   G4double expHallLength = 3.*WCLength; //jl145 - extra space to simulate cosmic muons more easily
 
-  G4cout << " expHallLength = " << expHallLength / m << G4endl;
+  G4cout << " expHallLength = " << expHallLength / CLHEP::m << G4endl;
   G4double expHallHalfLength = 0.5*expHallLength;
 
   G4Box* solidExpHall = new G4Box("expHall",
@@ -159,7 +182,6 @@ G4VPhysicalVolume* WCSimDetectorConstruction::Construct()
   //-----------------------------------------------------
   // Create and place the physical Volumes
   //-----------------------------------------------------
-
   // Experimental Hall
   G4VPhysicalVolume* physiExpHall = 
     new G4PVPlacement(0,G4ThreeVector(),
@@ -186,7 +208,11 @@ G4VPhysicalVolume* WCSimDetectorConstruction::Construct()
 
   // Reset the tubeID and tubeLocation maps before refiling them
   tubeIDMap.clear();
+  mrdtubeIDMap.clear();
+  facctubeIDMap.clear();
   tubeLocationMap.clear();
+  mrdtubeLocationMap.clear();
+  facctubeLocationMap.clear();
 
 
   // Traverse and print the geometry Tree
@@ -197,14 +223,20 @@ G4VPhysicalVolume* WCSimDetectorConstruction::Construct()
   TraverseReplicas(physiWCBox, 0, G4Transform3D(), 
 	           &WCSimDetectorConstruction::DescribeAndRegisterPMT) ;
   
-  
   TraverseReplicas(physiWCBox, 0, G4Transform3D(), 
 		   &WCSimDetectorConstruction::GetWCGeom) ;
-  
   DumpGeometryTableToFile();
+  
+  //G4cout<<"Writing GDML output file"<<G4endl;
+  //G4String GDMLOutFilename = "anniegeomv3.gdml";
+  //G4GDMLParser parser;  // Write GDML file
+  //parser.Write(GDMLOutFilename, logicExpHall);
+  //G4cout<<"GDML file "<<GDMLOutFilename<<" written"<<G4endl;
   
   // Return the pointer to the physical experimental hall
   return physiExpHall;
+  
+  
 }
 
 WCSimPMTObject *WCSimDetectorConstruction::CreatePMTObject(G4String PMTType, G4String CollectionName)
@@ -251,6 +283,16 @@ WCSimPMTObject *WCSimDetectorConstruction::CreatePMTObject(G4String PMTType, G4S
   }
   else if (PMTType == "BoxandLine12inchHQE"){
     WCSimPMTObject* PMT = new BoxandLine12inchHQE;
+    WCSimDetectorConstruction::SetPMTPointer(PMT, CollectionName);
+    return PMT;
+  }
+  else if (PMTType == "FlatFacedPMT2inch"){
+    WCSimPMTObject* PMT = new FlatFacedPMT2inch;
+    WCSimDetectorConstruction::SetPMTPointer(PMT, CollectionName);
+    return PMT;
+  }
+  else if (PMTType == "FlatFacedPMT4inch"){
+    WCSimPMTObject* PMT = new FlatFacedPMT4inch;
     WCSimDetectorConstruction::SetPMTPointer(PMT, CollectionName);
     return PMT;
   }
