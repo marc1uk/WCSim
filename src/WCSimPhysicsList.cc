@@ -84,9 +84,8 @@ void WCSimPhysicsList::ConstructProcess()
 #include "G4MuBremsstrahlung.hh"
 #include "G4MuPairProduction.hh"
 #include "G4hIonisation.hh"
+#include "G4MuonMinusCaptureAtRest.hh"
 
-// FDL replaced in 4.9 by G4MuonMinusCapture
-#include "G4MuonMinusCapture.hh"
 //K.Z.: New MultipleScattering classes 
 #include "G4eMultipleScattering.hh"
 #include "G4MuMultipleScattering.hh"
@@ -100,16 +99,16 @@ void WCSimPhysicsList::ConstructEM()
   //replaced by new G4MultipleScattering classes for e+-, mu+-, hadron and ions.
   //K. Zbiri, 12/30/2009
 
-  aParticleIterator->reset();
-  while( (*aParticleIterator)() ){
-    G4ParticleDefinition* particle = aParticleIterator->value();
+  theParticleIterator->reset();
+  while( (*theParticleIterator)() ){
+    G4ParticleDefinition* particle = theParticleIterator->value();
     G4ProcessManager* pmanager = particle->GetProcessManager();
     G4String particleName = particle->GetParticleName();
-
+     
     if (particleName == "gamma") {
     // gamma
       pmanager->AddDiscreteProcess(new G4GammaConversion());
-      pmanager->AddDiscreteProcess(new G4ComptonScattering());
+      pmanager->AddDiscreteProcess(new G4ComptonScattering());      
       pmanager->AddDiscreteProcess(new G4PhotoElectricEffect());
 
     } else if (particleName == "e-") {
@@ -188,21 +187,17 @@ void WCSimPhysicsList::ConstructEM()
       // MF , stolen from CWW, april 2005
       if (particleName == "mu-")
         {
-          // Change to G4MuonMinusCapture - FDL
-          //G4VProcess* aG4MuonMinusCaptureAtRest =
-          //  new G4MuonMinusCaptureAtRest();
-          //pmanager->AddProcess(aG4MuonMinusCaptureAtRest);
-          //pmanager->SetProcessOrdering(aG4MuonMinusCaptureAtRest,idxAtRest);
-          G4VProcess* aG4MuonMinusCapture = new G4MuonMinusCapture();
-          pmanager->AddProcess(aG4MuonMinusCapture);
-          pmanager->SetProcessOrdering(aG4MuonMinusCapture, idxAtRest);
+          G4VProcess* aG4MuonMinusCaptureAtRest =
+            new G4MuonMinusCaptureAtRest();
+          pmanager->AddProcess(aG4MuonMinusCaptureAtRest);
+          pmanager->SetProcessOrdering(aG4MuonMinusCaptureAtRest,idxAtRest);
         }
 
 
     } else if ((!particle->IsShortLived()) &&
 	       (particle->GetPDGCharge() != 0.0)&&
                (particle->GetParticleName() != "chargedgeantino")) {
-
+      // G4VProcess* aMultipleScattering = new G4MultipleScattering();
      G4VProcess* aMultipleScattering = new G4hMultipleScattering();
      G4VProcess* anIonisation        = new G4hIonisation();
      //
@@ -228,16 +223,16 @@ void WCSimPhysicsList::ConstructEM()
 void WCSimPhysicsList::ConstructlArStepLimiter(){
 
 #ifdef GEANT4_7_0
-  aParticleIterator->reset();
-  while( (*aParticleIterator)() ){
+  theParticleIterator->reset();
+  while( (*theParticleIterator)() ){
 
-    G4ParticleDefinition* particle = aParticleIterator->value();
+    G4ParticleDefinition* particle = theParticleIterator->value();
     G4ProcessManager* pmanager = particle->GetProcessManager();
 
      if ((!particle->IsShortLived()) &&
 	 (particle->GetPDGCharge() != 0.0)&&
 	 (particle->GetParticleName() != "chargedgeantino")) {
-       G4VProcess* stepLimiter = new G4StepLimiter();
+       G4VProcess* stepLimiter = new G4StepLimiter();   
        pmanager->AddProcess(stepLimiter);
        pmanager->SetProcessOrdering(stepLimiter,
 				    idxPostStep,
@@ -253,7 +248,6 @@ void WCSimPhysicsList::ConstructlArStepLimiter(){
 #include "G4OpWLS.hh"
 #include "G4OpMieHG.hh"
 #include "G4OpBoundaryProcess.hh"
-#include "G4Scintillation.hh"
 
 void WCSimPhysicsList::ConstructOp(){
 
@@ -263,8 +257,6 @@ void WCSimPhysicsList::ConstructOp(){
   G4OpWLS*              theWLSProcess                = new G4OpWLS();
   G4OpMieHG*  theMieHGScatteringProcess = new G4OpMieHG();
   G4OpBoundaryProcess* theBoundaryProcess          = new G4OpBoundaryProcess();
-  G4Scintillation* theScintProcess = new G4Scintillation("Scintillation");
-  
 
 //   theCherenkovProcess->DumpPhysicsTable();
 //   theAbsorptionProcess->DumpPhysicsTable();
@@ -276,27 +268,25 @@ void WCSimPhysicsList::ConstructOp(){
   theMieHGScatteringProcess->SetVerboseLevel(0);
   theBoundaryProcess->SetVerboseLevel(0);
   theWLSProcess->SetVerboseLevel(0);
-  theScintProcess->SetVerboseLevel(0);
-
+  
   theWLSProcess->UseTimeProfile("exponential");
 
   G4int MaxNumPhotons = 300;
   theCherenkovProcess->SetTrackSecondariesFirst(true);
   theCherenkovProcess->SetMaxNumPhotonsPerStep(MaxNumPhotons);
-  theScintProcess->SetTrackSecondariesFirst(true);
 
   // FROM N06 example:
   // theCherenkovProcess->SetMaxNumPhotonsPerStep(20);
   // theCherenkovProcess->SetMaxBetaChangePerStep(10.0);
   // theCherenkovProcess->SetTrackSecondariesFirst(true);
 
-  aParticleIterator->reset();
-  while( (*aParticleIterator)() )
+  theParticleIterator->reset();
+  while( (*theParticleIterator)() )
   {
-    G4ParticleDefinition* particle     = aParticleIterator->value();
+    G4ParticleDefinition* particle     = theParticleIterator->value();
     G4ProcessManager*     pmanager     = particle->GetProcessManager();
     G4String              particleName = particle->GetParticleName();
-
+    
     /*  if (theCherenkovProcess->IsApplicable(*particle))
 	pmanager->AddContinuousProcess(theCherenkovProcess);*/
 
@@ -304,15 +294,9 @@ void WCSimPhysicsList::ConstructOp(){
       pmanager->AddProcess(theCherenkovProcess);
       pmanager->SetProcessOrdering(theCherenkovProcess,idxPostStep);
       }
-      
-     if (theScintProcess->IsApplicable(*particle)) {
-       pmanager->AddProcess(theScintProcess);
-       pmanager->SetProcessOrderingToLast(theScintProcess, idxAtRest);
-       pmanager->SetProcessOrderingToLast(theScintProcess, idxPostStep);
-     }
-
-
-    if (particleName == "opticalphoton")
+    
+    
+    if (particleName == "opticalphoton") 
       {
 	pmanager->AddDiscreteProcess(theAbsorptionProcess);
 	//     G4cout << "warning direct light only\n";
@@ -332,11 +316,11 @@ void WCSimPhysicsList::ConstructGeneral()
 {
   // Add Decay Process
   G4Decay* theDecayProcess = new G4Decay();
-  aParticleIterator->reset();
-  while( (*aParticleIterator)() ){
-    G4ParticleDefinition* particle = aParticleIterator->value();
+  theParticleIterator->reset();
+  while( (*theParticleIterator)() ){
+    G4ParticleDefinition* particle = theParticleIterator->value();
     G4ProcessManager* pmanager = particle->GetProcessManager();
-    if (theDecayProcess->IsApplicable(*particle)) {
+    if (theDecayProcess->IsApplicable(*particle)) { 
       pmanager ->AddProcess(theDecayProcess);
       // set ordering for PostStepDoIt and AtRestDoIt
       pmanager ->SetProcessOrdering(theDecayProcess, idxPostStep);
@@ -360,51 +344,45 @@ void WCSimPhysicsList::ConstructGeneral()
 #include "G4NeutronInelasticProcess.hh"
 #include "G4AntiNeutronInelasticProcess.hh"
 #include "G4DeuteronInelasticProcess.hh"
-#include "G4INCLXXInterface.hh"
 #include "G4TritonInelasticProcess.hh"
-#include "G4BinaryLightIonReaction.hh"
 #include "G4AlphaInelasticProcess.hh"
 
 // Low-energy Models: < 20GeV
-// FDL replaced with G4HadronElastic
-// #include "G4LElastic.hh"
-#include "G4HadronElastic.hh"
-
-//#include "G4LEPionPlusInelastic.hh"
-//#include "G4LEPionMinusInelastic.hh"
-//#include "G4LEKaonPlusInelastic.hh"
-//#include "G4LEKaonZeroSInelastic.hh"
-//#include "G4LEKaonZeroLInelastic.hh"
-//#include "G4LEKaonMinusInelastic.hh"
-//#include "G4LEProtonInelastic.hh"
-//#include "G4LEAntiProtonInelastic.hh"
-//#include "G4LENeutronInelastic.hh"
-//#include "G4LEAntiNeutronInelastic.hh"
-//#include "G4LEDeuteronInelastic.hh"
-//#include "G4LETritonInelastic.hh"
-//#include "G4LEAlphaInelastic.hh"
+#include "G4LElastic.hh"
+#include "G4LEPionPlusInelastic.hh"
+#include "G4LEPionMinusInelastic.hh"
+#include "G4LEKaonPlusInelastic.hh"
+#include "G4LEKaonZeroSInelastic.hh"
+#include "G4LEKaonZeroLInelastic.hh"
+#include "G4LEKaonMinusInelastic.hh"
+#include "G4LEProtonInelastic.hh"
+#include "G4LEAntiProtonInelastic.hh"
+#include "G4LENeutronInelastic.hh"
+#include "G4LEAntiNeutronInelastic.hh"
+#include "G4LEDeuteronInelastic.hh"
+#include "G4LETritonInelastic.hh"
+#include "G4LEAlphaInelastic.hh"
 
 // High-energy Models: >20 GeV
-//#include "G4HEPionPlusInelastic.hh"
-//#include "G4HEPionMinusInelastic.hh"
-//#include "G4HEKaonPlusInelastic.hh"
-//#include "G4HEKaonZeroInelastic.hh"
-//#include "G4HEKaonZeroInelastic.hh"
-//#include "G4HEKaonMinusInelastic.hh"
-//#include "G4HEProtonInelastic.hh"
-//#include "G4HEAntiProtonInelastic.hh"
-//#include "G4HENeutronInelastic.hh"
-//#include "G4HEAntiNeutronInelastic.hh"
+#include "G4HEPionPlusInelastic.hh"
+#include "G4HEPionMinusInelastic.hh"
+#include "G4HEKaonPlusInelastic.hh"
+#include "G4HEKaonZeroInelastic.hh"
+#include "G4HEKaonZeroInelastic.hh"
+#include "G4HEKaonMinusInelastic.hh"
+#include "G4HEProtonInelastic.hh"
+#include "G4HEAntiProtonInelastic.hh"
+#include "G4HENeutronInelastic.hh"
+#include "G4HEAntiNeutronInelastic.hh"
 
 // Neutron high-precision models: <20 MeV
-
 #include "G4NeutronHPElastic.hh"
 #include "G4NeutronHPElasticData.hh"
 #include "G4NeutronHPCapture.hh"
 #include "G4NeutronHPCaptureData.hh"
 #include "G4NeutronHPInelastic.hh"
 #include "G4NeutronHPInelasticData.hh"
-#include "G4NeutronRadCapture.hh"	// >20MeV
+#include "G4LCapture.hh"
 
 //=================================
 // Added by JLR 2005-07-05
@@ -414,217 +392,129 @@ void WCSimPhysicsList::ConstructGeneral()
 #include "G4BinaryCascade.hh"
 
 // Stopping processes
-//#include "G4PiMinusAbsorptionAtRest.hh"
-// Replaced by below -FDL
-#include "G4PiMinusAbsorptionBertini.hh"
-//#include "G4KaonMinusAbsorptionAtRest.hh"
-// Replaced by below - FDL
-#include "G4KaonMinusAbsorptionBertini.hh"
-//#include "G4AntiProtonAnnihilationAtRest.hh"
-// Replaced by below - FDL
-#include "G4AntiProtonAbsorptionFritiof.hh"
+#include "G4PiMinusAbsorptionAtRest.hh"
+#include "G4KaonMinusAbsorptionAtRest.hh"
+#include "G4AntiProtonAnnihilationAtRest.hh"
 #include "G4AntiNeutronAnnihilationAtRest.hh"
 
-// Include the FTF model - FDL
-#include "G4FTFModel.hh"
-#include "G4LundStringFragmentation.hh"
-#include "G4ExcitedStringDecay.hh"
-#include "G4PreCompoundModel.hh"
-#include "G4GeneratorPrecompoundInterface.hh"
-#include "G4TheoFSGenerator.hh"
-#include "G4BinaryLightIonReaction.hh"
-
-void WCSimPhysicsList::ConstructHad()
+void WCSimPhysicsList::ConstructHad() 
 {
 
-// not sure if this comment still relevant.-----------
 // Makes discrete physics processes for the hadrons, at present limited
 // to those particles with GHEISHA interactions (INTRC > 0).
 // The processes are: Elastic scattering and Inelastic scattering.
 // F.W.Jones  09-JUL-1998
-// ----------------------------------------------------
-
+// 
 // This code stolen from:
 // examples/advanced/underground_physics/src/DMXPhysicsList.cc
 // CWW 2/23/05
 //
-
+  
   G4HadronElasticProcess* theElasticProcess = new G4HadronElasticProcess;
-  G4HadronElastic* theElasticModel = new G4HadronElastic;
+  G4LElastic* theElasticModel = new G4LElastic;
   theElasticProcess->RegisterMe(theElasticModel);
-
-  aParticleIterator->reset();
-  while ((*aParticleIterator)()) 
+  
+  theParticleIterator->reset();
+  while ((*theParticleIterator)()) 
     {
-
-     // Add the FRITIOF model - FDL
-      G4TheoFSGenerator* FTFP_model = new G4TheoFSGenerator();
-      G4GeneratorPrecompoundInterface* theCascade = new G4GeneratorPrecompoundInterface();
-      G4ExcitationHandler* theHandler = new G4ExcitationHandler();
-      G4PreCompoundModel* thePreEquilib = new G4PreCompoundModel(theHandler);
-      theCascade->SetDeExcitation(thePreEquilib);
-      FTFP_model->SetTransport(theCascade);
-      G4LundStringFragmentation* theFragmentation = new G4LundStringFragmentation();
-      G4ExcitedStringDecay* theStringDecay = new G4ExcitedStringDecay(theFragmentation);    
-      G4FTFModel* theStringModel = new G4FTFModel;
-      theStringModel->SetFragmentationModel(theStringDecay);
-      FTFP_model->SetHighEnergyGenerator(theStringModel);
-      G4ParticleDefinition* particle = aParticleIterator->value();
+      G4ParticleDefinition* particle = theParticleIterator->value();
       G4ProcessManager* pmanager = particle->GetProcessManager();
       G4String particleName = particle->GetParticleName();
 
-      if (particleName == "pi+")
+      if (particleName == "pi+") 
 	{
 	  pmanager->AddDiscreteProcess(theElasticProcess);
-	  G4PionPlusInelasticProcess* theInelasticProcess =
+	  G4PionPlusInelasticProcess* theInelasticProcess = 
 	    new G4PionPlusInelasticProcess();
-	  //G4LEPionPlusInelastic* theLEInelasticModel =
-	  //  new G4LEPionPlusInelastic;
-	  //theInelasticProcess->RegisterMe(theLEInelasticModel);
-	  //G4HEPionPlusInelastic* theHEInelasticModel =
-	  //  new G4HEPionPlusInelastic;
-	  //theInelasticProcess->RegisterMe(theHEInelasticModel);
+	  G4LEPionPlusInelastic* theLEInelasticModel = 
+	    new G4LEPionPlusInelastic;
+	  theInelasticProcess->RegisterMe(theLEInelasticModel);
+	  G4HEPionPlusInelastic* theHEInelasticModel = 
+	    new G4HEPionPlusInelastic;
+	  theInelasticProcess->RegisterMe(theHEInelasticModel);
+	  pmanager->AddDiscreteProcess(theInelasticProcess);
+	} 
 
-	  // Added Bertini Model - FDL
-	  G4CascadeInterface* theBertiniModel = new G4CascadeInterface;
-	  theBertiniModel->SetMaxEnergy(5.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(theBertiniModel);
-
-	  // Added FTFP Model - SS
-	  FTFP_model->SetMinEnergy(4.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(FTFP_model);
-	  
+      else if (particleName == "pi-") 
+	{
+	  pmanager->AddDiscreteProcess(theElasticProcess);
+	  G4PionMinusInelasticProcess* theInelasticProcess = 
+	    new G4PionMinusInelasticProcess();
+	  G4LEPionMinusInelastic* theLEInelasticModel = 
+	    new G4LEPionMinusInelastic;
+	  theInelasticProcess->RegisterMe(theLEInelasticModel);
+	  G4HEPionMinusInelastic* theHEInelasticModel = 
+	    new G4HEPionMinusInelastic;
+	  theInelasticProcess->RegisterMe(theHEInelasticModel);
+	  pmanager->AddDiscreteProcess(theInelasticProcess);
+	  G4String prcNam;
+	  pmanager->AddRestProcess(new G4PiMinusAbsorptionAtRest, ordDefault);
+	}
+      
+      else if (particleName == "kaon+") 
+	{
+	  pmanager->AddDiscreteProcess(theElasticProcess);
+	  G4KaonPlusInelasticProcess* theInelasticProcess = 
+	    new G4KaonPlusInelasticProcess();
+	  G4LEKaonPlusInelastic* theLEInelasticModel = 
+	    new G4LEKaonPlusInelastic;
+	  theInelasticProcess->RegisterMe(theLEInelasticModel);
+	  G4HEKaonPlusInelastic* theHEInelasticModel = 
+	    new G4HEKaonPlusInelastic;
+	  theInelasticProcess->RegisterMe(theHEInelasticModel);
+	  pmanager->AddDiscreteProcess(theInelasticProcess);
+	}
+      
+      else if (particleName == "kaon0S") 
+	{
+	  pmanager->AddDiscreteProcess(theElasticProcess);
+	  G4KaonZeroSInelasticProcess* theInelasticProcess = 
+	    new G4KaonZeroSInelasticProcess();
+	  G4LEKaonZeroSInelastic* theLEInelasticModel = 
+	    new G4LEKaonZeroSInelastic;
+	  theInelasticProcess->RegisterMe(theLEInelasticModel);
+	  G4HEKaonZeroInelastic* theHEInelasticModel = 
+	    new G4HEKaonZeroInelastic;
+	  theInelasticProcess->RegisterMe(theHEInelasticModel);
 	  pmanager->AddDiscreteProcess(theInelasticProcess);
 	}
 
-      else if (particleName == "pi-")
+      else if (particleName == "kaon0L") 
 	{
 	  pmanager->AddDiscreteProcess(theElasticProcess);
-	  G4PionMinusInelasticProcess* theInelasticProcess =
- 	    new G4PionMinusInelasticProcess();
-	  //G4LEPionMinusInelastic* theLEInelasticModel =
-	  //  new G4LEPionMinusInelastic;
-	  //theInelasticProcess->RegisterMe(theLEInelasticModel);
-	  //G4HEPionMinusInelastic* theHEInelasticModel =
-	  //  new G4HEPionMinusInelastic;
-	  //theInelasticProcess->RegisterMe(theHEInelasticModel);
-	  
-	  // Added Bertini Model - FDL
-	  G4CascadeInterface* theBertiniModel = new G4CascadeInterface;
-	  theBertiniModel->SetMaxEnergy(5.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(theBertiniModel);
+	  G4KaonZeroLInelasticProcess* theInelasticProcess = 
+	    new G4KaonZeroLInelasticProcess();
+	  G4LEKaonZeroLInelastic* theLEInelasticModel = 
+	    new G4LEKaonZeroLInelastic;
+	  theInelasticProcess->RegisterMe(theLEInelasticModel);
+	  G4HEKaonZeroInelastic* theHEInelasticModel = 
+	    new G4HEKaonZeroInelastic;
+	  theInelasticProcess->RegisterMe(theHEInelasticModel);
+	  pmanager->AddDiscreteProcess(theInelasticProcess);
+	}
 
-	  // Added FTFP Model - SS
-	  FTFP_model->SetMinEnergy(4.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(FTFP_model);
-
- 	  pmanager->AddDiscreteProcess(theInelasticProcess);
- 	  G4String prcNam;
-	  pmanager->AddRestProcess(new G4PiMinusAbsorptionBertini, ordDefault);
- 	}
-      else if (particleName == "kaon+")
- 	{
-	  pmanager->AddDiscreteProcess(theElasticProcess);
-	  G4KaonPlusInelasticProcess* theInelasticProcess =
- 	    new G4KaonPlusInelasticProcess();
- 	  //G4LEKaonPlusInelastic* theLEInelasticModel =
-	  //  new G4LEKaonPlusInelastic;
-	  //theInelasticProcess->RegisterMe(theLEInelasticModel);
-	  //G4HEKaonPlusInelastic* theHEInelasticModel =
-	  //  new G4HEKaonPlusInelastic;
-	  //theInelasticProcess->RegisterMe(theHEInelasticModel);
-      
-	  // Added Bertini Model - FDL
-          G4CascadeInterface* theBertiniModel = new G4CascadeInterface;
-          theBertiniModel->SetMaxEnergy(5.0*CLHEP::GeV);
-          theInelasticProcess->RegisterMe(theBertiniModel);
-
-          // Added FTFP Model - SS
-          FTFP_model->SetMinEnergy(4.0*CLHEP::GeV);
-          theInelasticProcess->RegisterMe(FTFP_model);
-
- 	  pmanager->AddDiscreteProcess(theInelasticProcess);
- 	}
-
-      else if (particleName == "kaon0S")
- 	{
- 	  pmanager->AddDiscreteProcess(theElasticProcess);
-	  G4KaonZeroSInelasticProcess* theInelasticProcess =
-	    new G4KaonZeroSInelasticProcess();
-	  //G4LEKaonZeroSInelastic* theLEInelasticModel =
-	  //  new G4LEKaonZeroSInelastic;
-	  //theInelasticProcess->RegisterMe(theLEInelasticModel);
-	  //G4HEKaonZeroInelastic* theHEInelasticModel =
-	  //  new G4HEKaonZeroInelastic;
-	  //theInelasticProcess->RegisterMe(theHEInelasticModel);
-
-	  // Added Bertini Model - FDL
-	  G4CascadeInterface* theBertiniModel = new G4CascadeInterface;
-	  theBertiniModel->SetMaxEnergy(10.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(theBertiniModel);
-
-	  // Added FTFP Model - SS
-	  FTFP_model->SetMinEnergy(3.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(FTFP_model);
-	  
- 	  pmanager->AddDiscreteProcess(theInelasticProcess);
- 	}
- 
-      else if (particleName == "kaon0L")
- 	{
- 	  pmanager->AddDiscreteProcess(theElasticProcess);
-	  G4KaonZeroLInelasticProcess* theInelasticProcess =
- 	    new G4KaonZeroLInelasticProcess();
- 	  //G4LEKaonZeroLInelastic* theLEInelasticModel =
-	  //  new G4LEKaonZeroLInelastic;
-	  //theInelasticProcess->RegisterMe(theLEInelasticModel);
-	  //G4HEKaonZeroInelastic* theHEInelasticModel =
-	  //  new G4HEKaonZeroInelastic;
-	  //theInelasticProcess->RegisterMe(theHEInelasticModel);
-	  
-	  // Added Bertini Model - FDL
-	  G4CascadeInterface* theBertiniModel = new G4CascadeInterface;
-	  theBertiniModel->SetMaxEnergy(10.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(theBertiniModel);
-
-	  // Added FTFP Model - SS
-	  FTFP_model->SetMinEnergy(3.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(FTFP_model);
-
- 	  pmanager->AddDiscreteProcess(theInelasticProcess);
- 	}
- 
-      else if (particleName == "kaon-")
- 	{
- 	  pmanager->AddDiscreteProcess(theElasticProcess);
-	  G4KaonMinusInelasticProcess* theInelasticProcess =
- 	    new G4KaonMinusInelasticProcess();
- 	  //G4LEKaonMinusInelastic* theLEInelasticModel =
-	  //  new G4LEKaonMinusInelastic;
-	  //theInelasticProcess->RegisterMe(theLEInelasticModel);
-	  //G4HEKaonMinusInelastic* theHEInelasticModel =
-	  //  new G4HEKaonMinusInelastic;
-	  //theInelasticProcess->RegisterMe(theHEInelasticModel);
-
-	  // Added Bertini Model - FDL
-	  G4CascadeInterface* theBertiniModel = new G4CascadeInterface;
-	  theBertiniModel->SetMaxEnergy(5.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(theBertiniModel);
-
-	  // Added FTFP Model - SS
-	  FTFP_model->SetMinEnergy(4.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(FTFP_model);
-
- 	  pmanager->AddDiscreteProcess(theInelasticProcess);
-	  pmanager->AddRestProcess(new G4KaonMinusAbsorptionBertini, ordDefault);
- 	}
- 
-      else if (particleName == "proton")
+      else if (particleName == "kaon-") 
 	{
 	  pmanager->AddDiscreteProcess(theElasticProcess);
-	  G4ProtonInelasticProcess* theInelasticProcess =
+	  G4KaonMinusInelasticProcess* theInelasticProcess = 
+	    new G4KaonMinusInelasticProcess();
+	  G4LEKaonMinusInelastic* theLEInelasticModel = 
+	    new G4LEKaonMinusInelastic;
+	  theInelasticProcess->RegisterMe(theLEInelasticModel);
+	  G4HEKaonMinusInelastic* theHEInelasticModel = 
+	    new G4HEKaonMinusInelastic;
+	  theInelasticProcess->RegisterMe(theHEInelasticModel);
+	  pmanager->AddDiscreteProcess(theInelasticProcess);
+	  pmanager->AddRestProcess(new G4KaonMinusAbsorptionAtRest, ordDefault);
+	}
+
+      else if (particleName == "proton") 
+	{
+	  pmanager->AddDiscreteProcess(theElasticProcess);
+	  G4ProtonInelasticProcess* theInelasticProcess = 
 	    new G4ProtonInelasticProcess();
 
+	  
 	  //=================================
 	  // Added by JLR 2005-07-05
 	  //=================================
@@ -632,86 +522,70 @@ void WCSimPhysicsList::ConstructHad()
 	  // Choice defined in jobOptions.mac, which is
 	  // read in before initialization of the run manager.
 	  // In the absence of this file, BINARY will be used.
-	  // Gheisha = Original Geant4 default
+	  // Gheisha = Original Geant4 default 
 	  // Bertini = Bertini intra-nuclear cascade model
 	  // Binary  = Binary intra-nuclear cascade model
-      
-
-	  //For the Geisha we use the Bertini model - FDL
-	  //if (gheishahad) {
-	  //  G4LEProtonInelastic* theLEInelasticModel = new G4LEProtonInelastic;
-	  //  theInelasticProcess->RegisterMe(theLEInelasticModel);
-	  //}
-	  //else if (bertinihad) {
-	  if (bertinihad) {
+	  if (gheishahad) {
+	    G4LEProtonInelastic* theLEInelasticModel = new G4LEProtonInelastic;
+	    theInelasticProcess->RegisterMe(theLEInelasticModel);
+	  }
+	  else if (bertinihad) {
 	    G4CascadeInterface* theBertiniModel = new G4CascadeInterface;
-	    theBertiniModel->SetMaxEnergy(5.0*CLHEP::GeV);
 	    theInelasticProcess->RegisterMe(theBertiniModel);
 	  }
 	  else if (binaryhad) {
 	    G4BinaryCascade* theBinaryModel = new G4BinaryCascade();
-	    theBinaryModel->SetMaxEnergy(5.0*CLHEP::GeV);
 	    theInelasticProcess->RegisterMe(theBinaryModel);
 
-	    // comment out the 3 lines and use the FTFP model - FDL
-	    //G4LEProtonInelastic* theLEInelasticModel = new G4LEProtonInelastic;
-	    //theLEInelasticModel->SetMinEnergy(10.1*GeV);
-	    //theLEInelasticModel->SetMaxEnergy( 45.*GeV );
-	    //theInelasticProcess->RegisterMe(theLEInelasticModel);
-//	    FTFP_model->SetMinEnergy(10.1*GeV);
-//	    FTFP_model->SetMaxEnergy(45.*GeV);
-//	    theInelasticProcess->RegisterMe(FTFP_model);
+	    G4LEProtonInelastic* theLEInelasticModel = new G4LEProtonInelastic;
+	    theLEInelasticModel->SetMinEnergy(10.1*GeV);
+	    theLEInelasticModel->SetMaxEnergy( 45.*GeV );
+	    theInelasticProcess->RegisterMe(theLEInelasticModel);
+
 	  }
 	  else {
-	    G4cout << "No secondary interaction model chosen! Using G4 BERTINI." << G4endl;
-	    G4CascadeInterface* theBertiniModel = new G4CascadeInterface;
-	    theBertiniModel->SetMaxEnergy(5.0*CLHEP::GeV);
-	    theInelasticProcess->RegisterMe(theBertiniModel);
+	    G4cout << "No secondary interaction model chosen! Using G4 BINARY." << G4endl;
+	    G4BinaryCascade* theBinaryModel = new G4BinaryCascade();
+	    theInelasticProcess->RegisterMe(theBinaryModel);
 	  }
 
-	  // Comment out the following 2 lines and use FTFP model - FDL
-	  // G4HEProtonInelastic* theHEInelasticModel = new G4HEProtonInelastic;
-	  // theInelasticProcess->RegisterMe(theHEInelasticModel);
-	  FTFP_model->SetMinEnergy(4.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(FTFP_model);
+	  G4HEProtonInelastic* theHEInelasticModel = new G4HEProtonInelastic;
+	  theInelasticProcess->RegisterMe(theHEInelasticModel);
 	  pmanager->AddDiscreteProcess(theInelasticProcess);
 	}
 
-      else if (particleName == "anti_proton")
+      else if (particleName == "anti_proton") 
 	{
 	  pmanager->AddDiscreteProcess(theElasticProcess);
-	  G4AntiProtonInelasticProcess* theInelasticProcess =
+	  G4AntiProtonInelasticProcess* theInelasticProcess = 
 	    new G4AntiProtonInelasticProcess();
-
-	  // Comment out the following 6 lines and use FTP model - FDL
-      //G4LEAntiProtonInelastic* theLEInelasticModel =
-	  //  new G4LEAntiProtonInelastic;
-	  //theInelasticProcess->RegisterMe(theLEInelasticModel);
-	  //G4HEAntiProtonInelastic* theHEInelasticModel =
-	  //  new G4HEAntiProtonInelastic;
-	  //theInelasticProcess->RegisterMe(theHEInelasticModel);
-	  theInelasticProcess->RegisterMe(FTFP_model);
-      pmanager->AddDiscreteProcess(theInelasticProcess);
+	  G4LEAntiProtonInelastic* theLEInelasticModel = 
+	    new G4LEAntiProtonInelastic;
+	  theInelasticProcess->RegisterMe(theLEInelasticModel);
+	  G4HEAntiProtonInelastic* theHEInelasticModel = 
+	    new G4HEAntiProtonInelastic;
+	  theInelasticProcess->RegisterMe(theHEInelasticModel);
+	  pmanager->AddDiscreteProcess(theInelasticProcess);
 	}
 
-      else if (particleName == "neutron")
+      else if (particleName == "neutron") 
 	{
 	  // elastic scattering
-	  G4HadronElasticProcess* theNeutronElasticProcess =
+	  G4HadronElasticProcess* theNeutronElasticProcess = 
 	    new G4HadronElasticProcess;
-	  G4HadronElastic* theElasticModel1 = new G4HadronElastic;
+	  G4LElastic* theElasticModel1 = new G4LElastic;
 	  G4NeutronHPElastic * theElasticNeutron = new G4NeutronHPElastic;
 	  theNeutronElasticProcess->RegisterMe(theElasticModel1);
-	  theElasticModel1->SetMinEnergy(19*CLHEP::MeV);
+	  theElasticModel1->SetMinEnergy(19*MeV);
 	  theNeutronElasticProcess->RegisterMe(theElasticNeutron);
 	  G4NeutronHPElasticData * theNeutronData = new G4NeutronHPElasticData;
 	  theNeutronElasticProcess->AddDataSet(theNeutronData);
 	  pmanager->AddDiscreteProcess(theNeutronElasticProcess);
-
+	  
 	  // inelastic scattering
 	  G4NeutronInelasticProcess* theInelasticProcess =
 	    new G4NeutronInelasticProcess();
-
+	  
 	  //=================================
 	  // Added by JLR 2005-07-05
 	  //=================================
@@ -719,187 +593,148 @@ void WCSimPhysicsList::ConstructHad()
 	  // Choice defined in jobOptions.mac, which is
 	  // read in before initialization of the run manager.
 	  // In the absence of this file, BINARY will be used.
-	  // GHEISHA = Original Geant4 default model
+	  // GHEISHA = Original Geant4 default model 
 	  // BERTINI = Bertini intra-nuclear cascade model
 	  // BINARY  = Binary intra-nuclear cascade model
-	  
-      // 
-//      if (gheishahad) {
-//      // Comment out the three lines and use the FTFP model - FDL
-//	    //G4LENeutronInelastic* theInelasticModel = new G4LENeutronInelastic;
-//	    //theInelasticModel->SetMinEnergy(19*MeV);
-//	    //theInelasticProcess->RegisterMe(theInelasticModel);
-//        FTFP_model->SetMinEnergy(19*MeV);
-//        theInelasticProcess->RegisterMe(FTFP_model);
-//	  }
-//	  else if (bertinihad) {
-	  if (bertinihad) {
+	  if (gheishahad) {
+	    G4LENeutronInelastic* theInelasticModel = new G4LENeutronInelastic;
+	    theInelasticModel->SetMinEnergy(19*MeV);
+	    theInelasticProcess->RegisterMe(theInelasticModel);
+	  }
+	  else if (bertinihad) {
 	    G4CascadeInterface* theBertiniModel = new G4CascadeInterface;
-	    theBertiniModel->SetMinEnergy(19*CLHEP::MeV);
-	    theBertiniModel->SetMaxEnergy(5.0*CLHEP::GeV);
+	    theBertiniModel->SetMinEnergy(19*MeV);
 	    theInelasticProcess->RegisterMe(theBertiniModel);
 	  }
 	  else if (binaryhad) {
 	    G4BinaryCascade* theBinaryModel = new G4BinaryCascade();
-	    theBinaryModel->SetMinEnergy(19*CLHEP::MeV);
-	    theBinaryModel->SetMaxEnergy(5.0*CLHEP::GeV);
+	    theBinaryModel->SetMinEnergy(19*MeV);
 	    theInelasticProcess->RegisterMe(theBinaryModel);
 
-//      // comment out following 4 lines and use the FTFP model - FDL
-//      //G4LENeutronInelastic* theInelasticModel = new G4LENeutronInelastic;
-//      //theInelasticModel->SetMinEnergy(10.1*GeV);
-//      //theInelasticModel->SetMaxEnergy( 45.*GeV );
-//      //theInelasticProcess->RegisterMe(theInelasticModel);
-//      FTFP_model->SetMinEnergy(10.1*GeV);
-//      FTFP_model->SetMaxEnergy(45.*GeV);
-//      theInelasticProcess->RegisterMe(FTFP_model);
+      G4LENeutronInelastic* theInelasticModel = new G4LENeutronInelastic;
+      theInelasticModel->SetMinEnergy(10.1*GeV);
+      theInelasticModel->SetMaxEnergy( 45.*GeV );
+      theInelasticProcess->RegisterMe(theInelasticModel);
 	  }
 	  else {
-	    G4cout << "No secondary interaction model chosen! Using G4 BERTINI." << G4endl;
-	    G4CascadeInterface* theBertiniModel = new G4CascadeInterface();
-	    theBertiniModel->SetMinEnergy(19*CLHEP::MeV);
-	    theBertiniModel->SetMaxEnergy(5.0*CLHEP::GeV);
-	    theInelasticProcess->RegisterMe(theBertiniModel);
+	    G4cout << "No secondary interaction model chosen! Using G4 BINARY." << G4endl;
+	    G4BinaryCascade* theBinaryModel = new G4BinaryCascade();
+	    theBinaryModel->SetMinEnergy(19*MeV);
+	    theInelasticProcess->RegisterMe(theBinaryModel);
 	  }
-
-      // Comment out the following 2 lines and use the FTFP model - FDL
-	  //G4HENeutronInelastic* theHEInelasticModel = new G4HENeutronInelastic;
-	  //theInelasticProcess->RegisterMe(theHEInelasticModel);
-	  FTFP_model->SetMinEnergy(4.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(FTFP_model);
-
+	  
+	  G4HENeutronInelastic* theHEInelasticModel = new G4HENeutronInelastic;
+	  theInelasticProcess->RegisterMe(theHEInelasticModel);
+	  
 	  G4NeutronHPInelastic * theLENeutronInelasticModel =
 	    new G4NeutronHPInelastic;
 	  theInelasticProcess->RegisterMe(theLENeutronInelasticModel);
-
-	  G4NeutronHPInelasticData * theNeutronData1 =
+	  
+	  G4NeutronHPInelasticData * theNeutronData1 = 
 	    new G4NeutronHPInelasticData;
 	  theInelasticProcess->AddDataSet(theNeutronData1);
 	  pmanager->AddDiscreteProcess(theInelasticProcess);
 
 	  // capture
-	  G4HadronCaptureProcess* theCaptureProcess = new G4HadronCaptureProcess;
-	  // Comment out next 4 lines we only need the HPCapture model -FDL
-	  // Instead HE ncapture replacement made for ANNIE. exceptions generated with no model > 20MeV
-	  G4NeutronRadCapture* theCaptureModel = new G4NeutronRadCapture;
+	  G4HadronCaptureProcess* theCaptureProcess =
+	    new G4HadronCaptureProcess;
+	  G4LCapture* theCaptureModel = new G4LCapture;
 	  theCaptureModel->SetMinEnergy(19*MeV);
 	  theCaptureProcess->RegisterMe(theCaptureModel);
-	  G4NeutronHPCapture* theCaptureModelHP = new G4NeutronHPCapture();
-	  theCaptureProcess->RegisterMe(theCaptureModelHP);
-	  G4NeutronHPCaptureData* theNeutronCaptureData = new G4NeutronHPCaptureData;
-	  theCaptureProcess->AddDataSet(theNeutronCaptureData);
-
+	  G4NeutronHPCapture * theLENeutronCaptureModel = new G4NeutronHPCapture;
+	  theCaptureProcess->RegisterMe(theLENeutronCaptureModel);
+	  G4NeutronHPCaptureData * theNeutronData3 = new G4NeutronHPCaptureData;
+	  theCaptureProcess->AddDataSet(theNeutronData3);
 	  pmanager->AddDiscreteProcess(theCaptureProcess);
+	  //  G4ProcessManager* pmanager = G4Neutron::Neutron->GetProcessManager();
+	  //  pmanager->AddProcess(new G4UserSpecialCuts(),-1,-1,1);
 	}
 
-      else if (particleName == "anti_neutron")
+      else if (particleName == "anti_neutron") 
 	{
 	  pmanager->AddDiscreteProcess(theElasticProcess);
-	  G4AntiNeutronInelasticProcess* theInelasticProcess =
+	  G4AntiNeutronInelasticProcess* theInelasticProcess = 
 	    new G4AntiNeutronInelasticProcess();
-
-	  // Comment out the following 6 lines and use the FTFP model - FDL
-	  //G4LEAntiNeutronInelastic* theLEInelasticModel =
-	  //  new G4LEAntiNeutronInelastic;
-	  //theInelasticProcess->RegisterMe(theLEInelasticModel);
-	  //G4HEAntiNeutronInelastic* theHEInelasticModel =
-	  //  new G4HEAntiNeutronInelastic;
-	  //theInelasticProcess->RegisterMe(theHEInelasticModel);
-	  theInelasticProcess->RegisterMe(FTFP_model);
+	  G4LEAntiNeutronInelastic* theLEInelasticModel = 
+	    new G4LEAntiNeutronInelastic;
+	  theInelasticProcess->RegisterMe(theLEInelasticModel);
+	  G4HEAntiNeutronInelastic* theHEInelasticModel = 
+	    new G4HEAntiNeutronInelastic;
+	  theInelasticProcess->RegisterMe(theHEInelasticModel);
 	  pmanager->AddDiscreteProcess(theInelasticProcess);
 	}
 
-else if (particleName == "deuteron")
- 	{
- 	  pmanager->AddDiscreteProcess(theElasticProcess);
-	  G4DeuteronInelasticProcess* theInelasticProcess =
- 	    new G4DeuteronInelasticProcess();
-	  // Comment out the 3 lines and use the FTFP model - FDL
-    //G4LEDeuteronInelastic* theLEInelasticModel =
-	  //  new G4LEDeuteronInelastic;
-	  //theInelasticProcess->RegisterMe(theLEInelasticModel);
-	  // Use INCL++ for low energy and FTFP for high energy - SS
-	  G4INCLXXInterface* theINCLXXModel = new G4INCLXXInterface();
-	  theINCLXXModel->SetMaxEnergy(3.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(theINCLXXModel);
-	  FTFP_model->SetMinEnergy(3.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(FTFP_model);
-	  
- 	  pmanager->AddDiscreteProcess(theInelasticProcess);
- 	}
-       
-      else if (particleName == "triton")
- 	{
- 	  pmanager->AddDiscreteProcess(theElasticProcess);
-	  G4TritonInelasticProcess* theInelasticProcess =
- 	    new G4TritonInelasticProcess();
-	  // Comment out the following 3 lines and use the FTFP model - FDL
-    //G4LETritonInelastic* theLEInelasticModel =
-	  //  new G4LETritonInelastic;
-	  //theInelasticProcess->RegisterMe(theLEInelasticModel);
-	  // Use Binary Light Ion Reaction for low energy
-	  // and FTFP for high energy - SS
-	  G4BinaryLightIonReaction* ionModel = new G4BinaryLightIonReaction();
-	  ionModel->SetMaxEnergy(10.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(ionModel);
-	  FTFP_model->SetMinEnergy(3.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(FTFP_model);
-
- 	  pmanager->AddDiscreteProcess(theInelasticProcess);
- 	}
+      else if (particleName == "deuteron") 
+	{
+	  pmanager->AddDiscreteProcess(theElasticProcess);
+	  G4DeuteronInelasticProcess* theInelasticProcess = 
+	    new G4DeuteronInelasticProcess();
+	  G4LEDeuteronInelastic* theLEInelasticModel = 
+	    new G4LEDeuteronInelastic;
+	  theInelasticProcess->RegisterMe(theLEInelasticModel);
+	  pmanager->AddDiscreteProcess(theInelasticProcess);
+	}
       
-      else if (particleName == "alpha")
- 	{
- 	  pmanager->AddDiscreteProcess(theElasticProcess);
-	  G4AlphaInelasticProcess* theInelasticProcess =
- 	    new G4AlphaInelasticProcess();
-	  // Comment out the following 3 lines and use the FTFP model - FDL
-    //G4LEAlphaInelastic* theLEInelasticModel =
-	  //  new G4LEAlphaInelastic;
-	  //theInelasticProcess->RegisterMe(theLEInelasticModel);
-	  // Use Binary for low energy and FTFP for high energy - SS
-	  // mo: G4BinaryCascade is not valid for incident alpha! results in an exception!
-	  // replace with BinaryLightIonReaction:
-	  G4BinaryLightIonReaction* theBinaryModel = new G4BinaryLightIonReaction();
-	  theBinaryModel->SetMaxEnergy(4.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(theBinaryModel);
-	  FTFP_model->SetMinEnergy(2.0*CLHEP::GeV);
-	  theInelasticProcess->RegisterMe(FTFP_model);
- 	  pmanager->AddDiscreteProcess(theInelasticProcess);
- 	}
+      else if (particleName == "triton") 
+	{
+	  pmanager->AddDiscreteProcess(theElasticProcess);
+	  G4TritonInelasticProcess* theInelasticProcess = 
+	    new G4TritonInelasticProcess();
+	  G4LETritonInelastic* theLEInelasticModel = 
+	    new G4LETritonInelastic;
+	  theInelasticProcess->RegisterMe(theLEInelasticModel);
+	  pmanager->AddDiscreteProcess(theInelasticProcess);
+	}
+
+      else if (particleName == "alpha") 
+	{
+	  pmanager->AddDiscreteProcess(theElasticProcess);
+	  G4AlphaInelasticProcess* theInelasticProcess = 
+	    new G4AlphaInelasticProcess();
+	  G4LEAlphaInelastic* theLEInelasticModel = 
+	    new G4LEAlphaInelastic;
+	  theInelasticProcess->RegisterMe(theLEInelasticModel);
+	  pmanager->AddDiscreteProcess(theInelasticProcess);
+	}
+
     }
 }
 
 //=================================
 // Added by JLR 2005-07-05
 //=================================
-// Sets secondary hadronic interaction model
+// Sets secondary hadronic interaction model 
 // Note: this is currently only implemented for
 // protons and neutrons -- not pions.
-// Gheisha = Original Geant4 default
+// Gheisha = Original Geant4 default 
 // Bertini = Bertini intra-nuclear cascade model
 // Binary  = Binary intra-nuclear cascade model
 void WCSimPhysicsList::SetSecondaryHad(G4String hadval)
 {
-
   SecondaryHadModel = hadval;
 
-  if (SecondaryHadModel == "BERTINI") {
+  if (SecondaryHadModel == "GHEISHA") {
+    G4cout << "Secondary interaction model set to GHEISHA" << G4endl;
+    gheishahad = true;
+    bertinihad = false;
+    binaryhad  = false;
+  }
+  else if (SecondaryHadModel == "BERTINI") {
     G4cout << "Secondary interaction model set to BERTINI" << G4endl;
-
+    gheishahad = false;
     bertinihad = true;
     binaryhad  = false;
   }
   else if (SecondaryHadModel == "BINARY") {
     G4cout << "Secondary interaction model set to BINARY" << G4endl;
-
+    gheishahad = false;
     bertinihad = false;
     binaryhad  = true;
   }
   else {
     G4cout << "Secondary interaction model " << SecondaryHadModel
 	   << " is not a valid choice. BINARY model will be used." << G4endl;
-
+    gheishahad = false;
     bertinihad = false;
     binaryhad  = true;
   }

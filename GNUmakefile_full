@@ -10,11 +10,8 @@ G4TARGET := $(name)
 G4EXLIB := true
 
 ifndef G4INSTALL
-  #G4INSTALL = ../../..
-  G4INSTALL = $GEANT4_MAKEFULL_PATH
+  G4INSTALL = ../../..
 endif
-
-G4SYSTEM=Linux-g++
 
 ROOTCFLAGS   := $(shell root-config --cflags) -DUSE_ROOT -fPIC
 ROOTLIBS     := $(shell root-config --libs)
