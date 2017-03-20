@@ -378,7 +378,7 @@ void WCSimEventAction::EndOfEventAction(const G4Event* evt)
 	(WCSimTrajectory*)((*(evt->GetTrajectoryContainer()))[i]);
 
       if (trj->GetCharge() != 0.)
- 	trj->DrawTrajectory();
+ 	trj->DrawTrajectory(50);
     }
 
    G4cout << " Filling Root Event " << G4endl;
