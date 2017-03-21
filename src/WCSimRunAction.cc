@@ -1,5 +1,6 @@
 #include "WCSimRunAction.hh"
 #include "WCSimRunActionMessenger.hh"
+#include "WCSimRootOptions.hh"
 
 #include "G4Run.hh"
 #include "G4UImanager.hh"
