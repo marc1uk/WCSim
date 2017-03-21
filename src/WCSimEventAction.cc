@@ -26,6 +26,9 @@
 #include "G4UnitsTable.hh"
 #include "G4UIcmdWith3VectorAndUnit.hh"
 
+#include "G4PhysicalConstants.hh"
+#include "G4SystemOfUnits.hh"
+
 #include <set>
 #include <iomanip>
 #include <string>
@@ -375,7 +378,7 @@ void WCSimEventAction::EndOfEventAction(const G4Event* evt)
 	(WCSimTrajectory*)((*(evt->GetTrajectoryContainer()))[i]);
 
       if (trj->GetCharge() != 0.)
- 	trj->DrawTrajectory(50);
+ 	trj->DrawTrajectory();
     }
 
    G4cout << " Filling Root Event " << G4endl;

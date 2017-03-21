@@ -69,6 +69,7 @@ public:
   void Cylinder_60x74_20inchBandL_40perCent();
   void Cylinder_12inchHPD_15perCent();
   void SetHyperKGeometry();
+  void CylinderGeometry();
   void UpdateGeometry();
   
 
@@ -137,6 +138,19 @@ public:
 
   // *** End Egg-Shaped HyperK Geometry ***
 
+// *** BeginCylinder Geometry
+
+    void SetCylinderHeight(G4double height){cylinderTank_Height = height; /*UpdateCylinderGeometry();*/}
+    void SetCylinderDiameter(G4double diameter){cylinderTank_Diameter = diameter; /*UpdateCylinderGeometry();*/}
+    void SetCylinderCoverage(G4double coverage){cylinderTank_Coverage = coverage; /*UpdateCylinderGeometry();*/}
+    void SetCylinderPMTType(G4String pmtType){cylinderTank_PMTType = pmtType; /*UpdateCylinderGeometry();*/}
+
+    void UpdateCylinderGeometry();
+
+    void   SetIsCylinder(G4bool choice) {isCylinder = choice;}
+    G4bool GetIsCylinder() {return isCylinder;}
+
+// *** End Cylinder Geometry
   std::vector<WCSimPmtInfo*>* Get_Pmts() {return &fpmts;}
 
   G4String GetIDCollectionName(){return WCIDCollectionName;}
@@ -373,7 +387,15 @@ private:
     G4int wallSlabCopyNo;
 
   // *** End egg-shaped HyperK Geometry ***
+// *** Begin Cylinder Geometry
 
+    G4double cylinderTank_Height;
+    G4double cylinderTank_Diameter;
+    G4double cylinderTank_Coverage;
+    G4String cylinderTank_PMTType;
+    G4bool isCylinder;
+
+// *** End Cylinder Geometry
   // amb79: debug to display all parts
   bool debugMode;
 
