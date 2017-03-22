@@ -15,3 +15,6 @@ geofile.txt
 #ingore root dictionary files? made automatically...
 src/WCSimRootDict.cxx
 src/WCSimRootDict_rdict.pcm
+
+#ignore gedit backups
+*~
