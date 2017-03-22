@@ -7,10 +7,14 @@ make.rootcint.result
 make.result
 bin/
 tmp/
+doxygen/
 
 #ignore run results
 wcsim.root
 geofile.txt
+
+#ignore gedit backups
+*~
 
 #ingore root dictionary files? made automatically...
 src/WCSimRootDict.cxx
@@ -18,3 +22,15 @@ src/WCSimRootDict_rdict.pcm
 
 #ignore gedit backups
 *~
+#*.root
+
+#ignore compiled ROOT scripts
+*_C.d
+*_C.so
+*_cxx.d
+*_cxx.so
+*_cc.d
+*_cc.so
+
+##ignore compiled python scripts
+*.pyc
