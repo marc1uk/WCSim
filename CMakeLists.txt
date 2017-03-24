@@ -3,14 +3,25 @@
 # Setup the project
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 project(WCSim)
-
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -Wall -fdiagnostics-color=always")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fdiagnostics-color=always")
+# NOTE: Geant4.10.2 changes the way VisualizationManager is instantiated - requires a verbosity argument.  
+# To handle the two types of instantiation: this env variable needs to be defined for geant versions > 10.1:
+if(DEFINED ENV{GEANT4_10_2})
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGEANT4_10_2")
+endif()
 #----------------------------------------------------------------------------
 # Find ROOT (required package) in CONFIG mode. Looking for ROOTConfig.cmake.
 # Crucial for loading the proper definitions!
 #
-#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} /home/marc/LinuxSystemFiles/ROOT/root-5.34.09/install/etc/cmake)
-# above to try to make it use root5.34: seems to be ignored for some reason. :| maybe an env variable still set?
-find_package(ROOT CONFIG REQUIRED)
+if(DEFINED ENV{ROOT_PATH})
+  list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
+  #message(STATUS "looking for root in ${CMAKE_MODULE_PATH}")
+  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} $ENV{ROOT_PATH})
+  message(STATUS "looking for root in ${CMAKE_MODULE_PATH}")
+endif()
+find_package(ROOT CONFIG REQUIRED )
+#find_package(ROOT MODULE REQUIRED)
 if(NOT ROOT_FOUND)
   message(STATUS "ROOT package not found.")  
   return()
@@ -51,6 +62,10 @@ target_link_libraries(WCSimRoot  ${ROOT_LIBRARIES})
 # You can set WITH_GEANT4_UIVIS to OFF via the command line or ccmake/cmake-gui
 # to build a batch mode only executable
 #
+if(DEFINED ENV{GEANT4_PATH})
+  set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} $ENV{GEANT4_PATH})
+  message(STATUS "Looking for GEANT4 in = ${CMAKE_PREFIX_PATH}")
+endif()
 option(WITH_GEANT4_UIVIS "Build example with Geant4 UI and Vis drivers" ON)
 if(WITH_GEANT4_UIVIS)
   find_package(Geant4 REQUIRED ui_all vis_all)
