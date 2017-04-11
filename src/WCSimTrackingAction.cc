@@ -15,6 +15,7 @@ WCSimTrackingAction::WCSimTrackingAction()
   ProcessList.insert("Decay") ;
   //ProcessList.insert("MuonMinusCaptureAtRest") ;
 //   ProcessList.insert("conv");
+  ProcessList.insert("nCapture");
   ParticleList.insert(111); // pi0
   ParticleList.insert(211); // pion+
   ParticleList.insert(-211);
@@ -22,6 +23,7 @@ WCSimTrackingAction::WCSimTrackingAction()
   ParticleList.insert(-321); // kaon-
   ParticleList.insert(311); // kaon0
   ParticleList.insert(-311); // kaon0 bar
+  ParticleList.insert(2112); //neutron
   // don't put gammas there or there'll be too many
 }
 

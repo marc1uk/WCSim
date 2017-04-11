@@ -71,8 +71,13 @@ WCSimDetectorMessenger::WCSimDetectorMessenger(WCSimDetectorConstruction* WCSimD
   SavePi0->SetParameterName("SavePi0",false);
   SavePi0->SetCandidates("true false");
   SavePi0->AvailableForStates(G4State_PreInit, G4State_Idle);
-  
-  
+
+  SaveCapture = new G4UIcmdWithAString("/WCSim/SaveCapture", this);
+  SaveCapture->SetGuidance("true or false");
+  SaveCapture->SetParameterName("SaveCapture",false);
+  SaveCapture->SetCandidates("true false");
+  SaveCapture->AvailableForStates(G4State_PreInit, G4State_Idle);
+
   PMTQEMethod = new G4UIcmdWithAString("/WCSim/PMTQEMethod", this);
   PMTQEMethod->SetGuidance("Set the PMT configuration.");
   PMTQEMethod->SetGuidance("Available options are:\n"
@@ -167,6 +172,7 @@ WCSimDetectorMessenger::~WCSimDetectorMessenger()
 {
   delete PMTConfig;
   delete SavePi0;
+  delete SaveCapture;
   delete PMTQEMethod;
   delete PMTCollEff;
   delete waterTank_Length;
@@ -222,6 +228,17 @@ void WCSimDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 	  }else{
 	    
 	  }
+	}
+
+	if (command == SaveCapture){
+		G4cout << "Set the flag for saving neutron capture info " << newValue << G4endl;
+		if (newValue=="true"){
+			WCSimDetector->SaveCaptureInfo(true);
+		}else if (newValue == "false"){
+			WCSimDetector->SaveCaptureInfo(false);
+		}else{
+
+		}
 	}
 
 	if (command == PMTQEMethod){

@@ -708,8 +708,10 @@ void WCSimEventAction::FillRootEvent(G4int event_id,
 
 
       // Add the track to the TClonesArray, watching out for times
-      if ( ! ( (ipnu==22)&&(parentType==999))  ) {
-	int choose_event=0;
+      if ( trj->GetCreatorProcessName()=="nCapture" ?
+      detectorConstructor->SaveCaptureInfo() : ! ( (ipnu==22)&&(parentType==999))  ) {
+
+      int choose_event=0;
 
 	if (ngates)
 	{
@@ -762,6 +764,15 @@ void WCSimEventAction::FillRootEvent(G4int event_id,
 		wcsimrootevent->SetPi0Info(pi0Vtx, gammaID, gammaE, gammaVtx);
 	  }
 	}
+  }
+      if (detectorConstructor->SaveCaptureInfo() && trj->GetCreatorProcessName()=="nCapture"){
+          G4cout << "Capture particle: " << trj->GetParticleName()
+                 << " Parent: " << trj->GetParentID()
+                 << " T:" << ttime
+                 << " vtx:(" << start[0] << "," << start[1] << "," << start[2]
+                 << " dir:(" << dir[0] << "," << dir[1] << "," << dir[2]
+                 << " E:" << energy << G4endl;
+          wcsimrootevent->SetCaptureParticle(trj->GetParentID(), ipnu, ttime, start, dir, energy, id);
       }
     }
   }

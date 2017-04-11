@@ -64,7 +64,14 @@ WCSimDetectorConstruction::WCSimDetectorConstruction(G4int DetConfig,WCSimTuning
   //-----------------------------------------------------
 
   SavePi0Info(false);
-  
+
+
+  //-----------------------------------------------------
+  // Set whether or not neutron capture info is saved
+  //-----------------------------------------------------
+
+  SaveCaptureInfo(false);
+
   //-----------------------------------------------------
   // Set the default method for implementing the PMT QE
   //-----------------------------------------------------
