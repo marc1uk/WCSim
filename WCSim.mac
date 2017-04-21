@@ -145,9 +145,25 @@
 #/gps/ang/minphi 0 deg
 #/gps/ang/maxphi 360 deg
 
+# Bonsai laser source for SK tank:
+/mygen/generator laser
+/gps/particle e-
+#/gps/particle pi0
+/gps/pos/type Volume
+/gps/pos/shape Cylinder
+/gps/pos/radius 15 m
+/gps/pos/halfz 15 m
+/gps/ang/type iso
+/gps/energy 10 MeV
+/gps/ene/type Mono
+/gps/ene/gradient 0
+/gps/ene/intercept 1
+#/DarkRate/SetDarkRate 0 kHz
+#
+
 ## change the name of the output root file, default = wcsim.root
 
 /WCSimIO/RootFile wcsim.root
 
-/run/beamOn 10
+/run/beamOn 100
 #exit
