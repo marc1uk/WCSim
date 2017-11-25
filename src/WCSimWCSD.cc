@@ -103,6 +103,8 @@ G4bool WCSimWCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
     // it is a primary photon
     primParentID=-1;
   }
+  int numscatters= WCSimTrackInformation::GetNumScatterings();
+  std::map<std::string, int> scatterings = WCSimTrackInformation::GetScatterings();
 
   G4int    trackID           = aStep->GetTrack()->GetTrackID();
   G4String volumeName        = aStep->GetTrack()->GetVolume()->GetName();
@@ -259,6 +261,8 @@ G4bool WCSimWCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 	     (*hitsCollection)[PMTHitMap[replicaNumber]-1]->AddPe(hitTime);
 	     (*hitsCollection)[PMTHitMap[replicaNumber]-1]->AddParentID(primParentID);
 	     (*hitsCollection)[PMTHitMap[replicaNumber]-1]->AddHitPos(worldPosition);
+	     (*hitsCollection)[PMTHitMap[replicaNumber]-1]->AddHitNScatters(numscatters);
+	     (*hitsCollection)[PMTHitMap[replicaNumber]-1]->AddHitScatters(scatterings);
 	     
 	     //     if ( particleDefinition != G4OpticalPhoton::OpticalPhotonDefinition() )
 	     //       newHit->Print();
@@ -267,6 +271,8 @@ G4bool WCSimWCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 	   (*hitsCollection)[PMTHitMap[replicaNumber]-1]->AddPe(hitTime);
 	   (*hitsCollection)[PMTHitMap[replicaNumber]-1]->AddParentID(primParentID);
 	   (*hitsCollection)[PMTHitMap[replicaNumber]-1]->AddHitPos(worldPosition);
+	   (*hitsCollection)[PMTHitMap[replicaNumber]-1]->AddHitNScatters(numscatters);
+	   (*hitsCollection)[PMTHitMap[replicaNumber]-1]->AddHitScatters(scatterings);
 	   
          }
        }
@@ -317,6 +323,8 @@ G4bool WCSimWCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 	   (*hitsCollectionlappd)[LAPPDHitMap[replicaNumber2]-1]->AddParentID(primParentID);
 	   (*hitsCollectionlappd)[LAPPDHitMap[replicaNumber2]-1]->AddStripPosition(localPosition);
 	   (*hitsCollectionlappd)[LAPPDHitMap[replicaNumber2]-1]->AddHitPos(worldPosition);
+	   (*hitsCollectionlappd)[LAPPDHitMap[replicaNumber2]-1]->AddHitNScatters(numscatters);
+	   (*hitsCollectionlappd)[LAPPDHitMap[replicaNumber2]-1]->AddHitScatters(scatterings);
 	   //G4cout<<"hitTime= "<<hitTime<<" primParentID= "<<primParentID<<G4endl;
 	   //     if ( particleDefinition != G4OpticalPhoton::OpticalPhotonDefinition() )
 	   //       newHit->Print();
@@ -324,6 +332,8 @@ G4bool WCSimWCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
        else {
 	 (*hitsCollectionlappd)[LAPPDHitMap[replicaNumber2]-1]->AddPe(hitTime);
 	 (*hitsCollectionlappd)[LAPPDHitMap[replicaNumber2]-1]->AddParentID(primParentID);
+	 (*hitsCollectionlappd)[LAPPDHitMap[replicaNumber2]-1]->AddHitNScatters(numscatters);
+	 (*hitsCollectionlappd)[LAPPDHitMap[replicaNumber2]-1]->AddHitScatters(scatterings);
 	 //G4cout<<"add new localPosition : "<<localPosition(0)<<","<<localPosition(1)<<","<<localPosition(2)<<G4endl;
          (*hitsCollectionlappd)[LAPPDHitMap[replicaNumber2]-1]->AddStripPosition(localPosition);
          (*hitsCollectionlappd)[LAPPDHitMap[replicaNumber2]-1]->AddHitPos(worldPosition);

@@ -13,7 +13,7 @@
 #include <vector>
 #include <iostream>
 #include "jhfNtuple.h"
-//#include <map>
+#include <map>
 //#include "G4Transform3D.hh"
 
 // #include "WCSimDetectorConstruction.hh"
@@ -120,15 +120,21 @@ private:
   // See jhfNtuple.h for the meaning of these data members:
   Float_t fTruetime;
   Int_t   fPrimaryParentID;
+  long long int fNumScatterings;
+  std::map<std::string,int> fScatterings;
 
 public:
   WCSimRootCherenkovHitTime() {}
   WCSimRootCherenkovHitTime(Float_t truetime,
-			    Int_t   primaryParentID);
+			    Int_t   primaryParentID,
+			    long long int numscatters,
+			    std::map<std::string,int> processes);
   virtual ~WCSimRootCherenkovHitTime() { }
 
   Float_t   GetTruetime() { return fTruetime;}
   Int_t     GetParentID() { return fPrimaryParentID;}
+  long long int GetNumScatterings() { return fNumScatterings;}
+  std::map<std::string,int> GetScatterings() { return fScatterings;}
 
   ClassDef(WCSimRootCherenkovHitTime,1)  
 };
@@ -330,7 +336,10 @@ public:
 
   WCSimRootCherenkovHit   *AddCherenkovHit(Int_t                tubeID,
 					  std::vector<Float_t> truetime,
-					  std::vector<Int_t>   primParID);
+					  std::vector<Int_t>   primParID,
+					  std::vector<long long int> numscatters,
+					  std::vector<std::map<std::string,int> > processes
+					  );
   TClonesArray        *GetCherenkovHits() const {return fCherenkovHits;}
   TClonesArray        *GetCherenkovHitTimes() const {return fCherenkovHitTimes;}
 

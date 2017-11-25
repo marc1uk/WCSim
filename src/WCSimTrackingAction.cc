@@ -64,6 +64,13 @@ void WCSimTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
   anInfo->WillBeSaved(false);
   theTrack->SetUserInformation(anInfo);
   */
+  
+  // clear scattering info as they are static members of the class. 
+  // N.B. this requires photons will be tracked from generation to absorption in one go.
+  if (aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition() ){
+    WCSimTrackInformation::numscatters=0;
+    WCSimTrackInformation::scatterings.clear();
+  }
 }
 
 void WCSimTrackingAction::PostUserTrackingAction(const G4Track* aTrack)

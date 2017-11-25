@@ -32,6 +32,16 @@ public:
   
   void IncrementNumReflections() {numreflections++;}
   long long int GetNumReflections() {return numreflections;}
+  
+  static long long int numscatters;
+  static void IncrementScatterings() {numscatters++;}
+  static long long int GetNumScatterings() { return numscatters;} 
+  static std::map<std::string,int> scatterings;
+  static void AddProcess(std::string processname){
+    if(scatterings.count(processname)==0) scatterings.emplace(processname,1);
+    else scatterings.at(processname)++;
+  }
+  static std::map<std::string,int> GetScatterings(){ return scatterings; }
 
   inline void *operator new(size_t);
   inline void operator delete(void *aTrackInfo);

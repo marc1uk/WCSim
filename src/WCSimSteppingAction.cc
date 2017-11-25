@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <map>
 
 #include "WCSimSteppingAction.hh"
 #include "G4ParticleDefinition.hh"
@@ -117,6 +118,19 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
       default:
         break;
       }
+    } else {
+      G4String processname = aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
+      
+      // just for printing, keep a static list of all photon processes encountered and show new ones
+      static std::map<std::string,int> photonprocesses;
+      if(photonprocesses.count(processname)==0){
+        photonprocesses.emplace(processname,1);
+        G4cout<<"################ photon non-transportation process : "<<processname<<"################\n";
+      }
+      
+      // add the scattering info to the photon
+      WCSimTrackInformation::IncrementScatterings();
+      WCSimTrackInformation::AddProcess(processname);
     }
   }
 }
