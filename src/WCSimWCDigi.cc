@@ -108,4 +108,35 @@ void WCSimWCDigi::RemoveDigitizedGate(G4int gate)
 
   //number of entries counter
   totalPe--;
+
+    // ======= debug check
+    int timesize=time.size();
+    int timecount=0;
+    for (auto& x: time){
+      try{
+        int timefirst = x.first;
+        float timesecond = x.second;
+        timecount++;
+      }
+      catch (...) {
+        G4cerr << G4endl << "RemoveDigitizedGate debug check: Exception reading map entry!!"<<G4endl;
+        break;
+      }
+    }
+    if(timesize!=timecount){
+      G4cerr<<"In WCSimWCDigi::RemoveDigitizedGate, time.size() and number of entries mismatch!!!"<<G4endl;
+      G4cerr<<"timesize="<<timesize<<", timecount="<<timecount<<", time entries: "<<G4endl;
+      for (auto& x: time){
+        try{
+          G4cerr << x.first << ": ";
+          G4cerr << x.second << G4endl;
+        }
+        catch (...) {
+          G4cerr << G4endl << "Exception reading map entry!!"<<G4endl;
+          break;
+        }
+      }
+      assert(false);
+    }
+    // ======= debug check
 }

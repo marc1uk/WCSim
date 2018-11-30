@@ -12,6 +12,7 @@
 #include <map>
 #include <vector>
 #include <exception>
+#include <cassert>
 
 // for sort, find, count_if
 #include <algorithm>
@@ -149,6 +150,36 @@ public:
   inline G4int   GetLAPPDID() {return lappdID;};
   inline G4float GetPe(int gate)     {return pe.at(gate);};
   inline G4float GetTime(int gate)   {
+    // ======= debug check
+    int timesize=time.size();
+    int timecount=0;
+    for (auto& x: time){
+      try{
+        int timefirst = x.first;
+        float timesecond = x.second;
+        timecount++;
+      }
+      catch (...) {
+        G4cerr << G4endl << "GetTime Exception reading map entry!!"<<G4endl;
+        break;
+      }
+    }
+    if(timesize!=timecount){
+      G4cerr<<"In WCSimWCDigi::GetTime, time.size() and number of entries mismatch!!!"<<G4endl;
+      G4cerr<<"timesize="<<timesize<<", timecount="<<timecount<<", time entries: "<<G4endl;
+      for (auto& x: time){
+        try{
+          G4cerr << x.first << ": ";
+          G4cerr << x.second << G4endl;
+        }
+        catch (...) {
+          G4cerr << G4endl << "Exception reading map entry!!"<<G4endl;
+          break;
+        }
+      }
+      assert(false);
+    }
+    // ======= debug check
     try {
       return time.at(gate);
     }
