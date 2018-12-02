@@ -96,6 +96,7 @@ public:
   inline void SetPe(G4int gate,  G4float Q)      {pe[gate]     = Q;};
   inline void SetTime(G4int gate, G4float T)    {
     time[gate]   = T;
+    // ======= debug check
     int timesize=time.size();
     int timecount=0;
     for (auto& x: time){
@@ -124,6 +125,7 @@ public:
       }
       assert(false);
     }
+    // ======= debug check
   };
   inline void SetPreSmearTime(G4int gate, G4float T)    {time_presmear[gate]   = T;};
   inline void SetParentID(G4int gate, G4int parent) { primaryParentID[gate] = parent; };

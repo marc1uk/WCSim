@@ -79,7 +79,10 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
    //      <<"               boundaryStatus is      "<<boundary->GetStatus()<<G4endl;
    if ( track->GetCurrentStepNumber() > 50000 ){   // 50k steps: sufficiently generous?
      track->SetTrackStatus(fStopAndKill); 
-     G4cout<<"killing broken photon "<<++numbrokenphotons<<G4endl;
+     G4cout<<"killing broken photon "<<++numbrokenphotons<<" at ("
+           <<aStep->GetPostStepPoint()->GetPosition().x()<<", "
+           <<aStep->GetPostStepPoint()->GetPosition().y()<<", "
+           <<aStep->GetPostStepPoint()->GetPosition().z()<<")"<<G4endl;
      fExpectedNextStatus=Undefined;
      return;
    }
