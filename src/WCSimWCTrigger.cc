@@ -649,6 +649,8 @@ void WCSimWCTriggerBase::AlgPromptDigits(WCSimWCDigitsCollection* WCDCPMT, bool 
         G4cerr<<"Exception in WCSimWCTriggerBase::FillDigitsCollection call to WCSimWCDigi::GetTime "
               <<G4endl<<"Attempt to retrieve time from pe "<<ip<<" in WCDCPMT entry "<<i<<G4endl;
         G4cerr<<"The digi had "<<(*WCDCPMT)[i]->GetTotalPe()<<" total pe's."<<G4endl;
+        G4cerr<<"digit_time_it->first="<<digit_time_it->first<<", "
+              <<"digit_time_it->second="<<digit_time_it->second;
         //assert(false);
         digit_time=-996;
       }

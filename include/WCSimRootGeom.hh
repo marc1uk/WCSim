@@ -118,8 +118,14 @@ public:
   void  AddPmtTypeCount(Int_t thenum){fWCNumPMTvec.push_back(thenum);}
   void  AddPmtName(std::string thename){fWCPMTNamevec.push_back(thename);}
   void  SetTubeIdType(int tubeNo, int index){
+    if(fWCTubeIdvsColIndex.count(tubeNo)){
+      std::cerr<<"Repeated call to SetTubeIdType for tube "<<tubeNo
+               <<". PMT Type should only be set once!"<<std::endl;
+      exit(1);
+    }
     fWCTubeIdvsColIndex.emplace(std::make_pair(tubeNo,index));
     if(index>=fWCTubeIdsByCollection.size()){
+      // first PMT of a new collection. Expand the vector accordingly.
       fWCTubeIdsByCollection.resize(index+1,std::vector<int>{});
     }
     fWCTubeIdsByCollection.at(index).push_back(tubeNo);
@@ -153,7 +159,7 @@ public:
     return std::vector<int>{fWCNumPMT};
   }
   Int_t GetTubeIndex(Int_t tubeId){
-    if(tubeId>=fWCTubeIdvsColIndex.size()) return -1;
+    if(fWCTubeIdvsColIndex.count(tubeId)==0) return -1;
     return fWCTubeIdvsColIndex.at(tubeId);
   }
   std::vector<int> GetTubesInCollection(int collectionindex){

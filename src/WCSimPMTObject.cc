@@ -571,7 +571,7 @@ G4float PMT10inch::GetDarkRateConversionFactor(){
 PMT10inchHQE::PMT10inchHQE() {}
 PMT10inchHQE::~PMT10inchHQE(){}
 
-G4String PMT10inchHQE::GetPMTName() {G4String PMTName = "10inch"; return PMTName;}
+G4String PMT10inchHQE::GetPMTName() {G4String PMTName = "10inchHQE"; return PMTName;}
 G4double PMT10inchHQE::GetExposeHeight() {return 117.*CLHEP::mm;}
 G4double PMT10inchHQE::GetRadius() {return 127.*CLHEP::mm;}
 G4double PMT10inchHQE::GetPMTGlassThickness() {return 0.55*CLHEP::cm;}
@@ -1640,7 +1640,7 @@ G4float BoxandLine12inchHQE::GetDarkRateConversionFactor(){
 FlatFacedPMT2inch::FlatFacedPMT2inch(){}
 FlatFacedPMT2inch::~FlatFacedPMT2inch(){}
 
-G4String FlatFacedPMT2inch::GetPMTName() {G4String PMTName = "FlatFaced2inch"; return PMTName;}
+G4String FlatFacedPMT2inch::GetPMTName() {G4String PMTName = "EMI9954KB"; return PMTName;}
 G4double FlatFacedPMT2inch::GetRadius() {return 50.8*CLHEP::mm;}
 G4double FlatFacedPMT2inch::GetPMTGlassThickness() {return 0.3*CLHEP::cm;} // arbitrary
 G4double FlatFacedPMT2inch::GetGelThickness() { return 0.1*CLHEP::cm;}		
@@ -2639,7 +2639,7 @@ G4float* PMT_R7081::GetCollectionEfficiencyArray(){
 PMT_R7081HQE::PMT_R7081HQE() {}
 PMT_R7081HQE::~PMT_R7081HQE(){}
 
-G4String PMT_R7081HQE::GetPMTName() {G4String PMTName = "PMT_R7081HQE"; return PMTName;}
+G4String PMT_R7081HQE::GetPMTName() {G4String PMTName = "R7081HQE"; return PMTName;}
 G4double PMT_R7081HQE::GetExposeHeight() {return 117.*CLHEP::mm;}
 G4double PMT_R7081HQE::GetRadius() {return 127.*CLHEP::mm;}
 G4double PMT_R7081HQE::GetPMTGlassThickness() {return 0.55*CLHEP::cm;}

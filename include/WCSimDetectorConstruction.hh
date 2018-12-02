@@ -146,16 +146,30 @@ public:
 
   WCSimPMTObject *CreatePMTObject(G4String, G4String);
 
-  std::map<G4String, WCSimPMTObject*>  CollectionNameMap; 
-  WCSimPMTObject * PMTptr;
+  std::map<G4String, WCSimPMTObject*>  CollectionNameMap;
  
   void SetPMTPointer(WCSimPMTObject* PMT, G4String CollectionName){
-    CollectionNameMap[CollectionName] = PMT;
+    if(CollectionNameMap.count(CollectionName)!=0){
+      G4cerr<<"Repeated call to SetPMTPointer for collection "
+            <<CollectionName<<"! Each collection should only have it's PMT type declared once!"<<G4endl;
+      exit(1);
+    } else {
+      CollectionNameMap.emplace(CollectionName, PMT);
+    }
   }
 
   WCSimPMTObject* GetPMTPointer(G4String CollectionName){
-    PMTptr = CollectionNameMap[CollectionName];
-    if (PMTptr == NULL) {G4cout << CollectionName << " is not a recognized hit collection. Exiting WCSim." << G4endl; exit(1);}
+    WCSimPMTObject* PMTptr = nullptr;
+    if(CollectionNameMap.count(CollectionName)==0){
+      G4cerr << CollectionName << " is not a recognized hit collection. Exiting WCSim." << G4endl;
+      exit(1);
+    } else {
+      PMTptr = CollectionNameMap.at(CollectionName);
+    }
+    if(PMTptr==nullptr){
+      G4cerr<< "PMT pointer in CollectionNameMap for CollectionName "<<CollectionName<<" is null!"<<G4endl;
+      exit(1);
+    }
     return PMTptr;
   }
  

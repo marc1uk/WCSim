@@ -206,6 +206,11 @@ void WCSimRunAction::FillGeoTree(){
       wcsimrootgeom->AddPmtTypeCount(pmtcount);
       numpmt+=pmtcount;
     }
+    if(wcsimdetector->GetTotalNumPmts()!=numpmt){
+      std::cerr<<"RunAction PMT count "<<numpmt<<" does not match DetectorConstruction TotalNumPmts "
+               <<wcsimdetector->GetTotalNumPmts()<<std::endl;
+      assert(false);
+    }
   } else {
     numpmt = wcsimdetector->GetTotalNumPmts();
   }
@@ -223,6 +228,12 @@ void WCSimRunAction::FillGeoTree(){
   wcsimrootgeom-> SetWCOffset(offset[0],offset[1],offset[2]);
   
   std::vector<WCSimPmtInfo*> *fpmts = wcsimdetector->Get_Pmts();
+  if (fpmts->size() != (unsigned int)numpmt) {
+    G4cout << "Mismatch between number of pmts and pmt list in geofile.txt!!"<<G4endl;
+    G4cout << fpmts->size() <<" vs. "<< numpmt <<G4endl;
+    assert(false);
+  }
+  
   WCSimPmtInfo *pmt;
   std::string tankpmtname="unset";
   G4String WCCollectionName = wcsimdetector->GetIDCollectionName();
@@ -253,13 +264,10 @@ void WCSimRunAction::FillGeoTree(){
       if(tankpmtname=="unset"){
         std::cerr<<"RunAction error filling wcsimrootgeom!"
                    " tankcollectionnames not filled, but WCIDCollectionName not set"<<std::endl;
+        assert(false);
       }
       wcsimrootgeom-> SetPMT(i,tubeNo,cylLoc,rot,pos,tankpmtname);
     }
-  }
-  if (fpmts->size() != (unsigned int)numpmt) {
-    G4cout << "Mismatch between number of pmts and pmt list in geofile.txt!!"<<G4endl;
-    G4cout << fpmts->size() <<" vs. "<< numpmt <<G4endl;
   }
   
   wcsimrootgeom-> SetWCNumPMT(numpmt);
