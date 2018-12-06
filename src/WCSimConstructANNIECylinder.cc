@@ -464,11 +464,11 @@ void WCSimDetectorConstruction::ConstructANNIECaps(G4int zflip)
 	G4String thecollectionName;
 	//G4cout<<"Adding cap PMTs to "<<WCDetectorName<<" detetor"<<G4endl;
 	if(zflip>0){
-		thecollectionName = WCTankCollectionNames.at(1);
-		WCPMTName = WCPMTNameMap.at(thecollectionName); // bottom is D784KFLB
-	} else {
 		thecollectionName = WCTankCollectionNames.at(0);
-		WCPMTName = WCPMTNameMap.at(thecollectionName); // top is R7081
+		WCPMTName = WCPMTNameMap.at(thecollectionName); // bottom is R7081
+	} else {
+		thecollectionName = WCTankCollectionNames.at(1);
+		WCPMTName = WCPMTNameMap.at(thecollectionName); // top is D784KFLB
 	}
 	//G4cout<<"Placing "<<WCPMTName<<" in " << ((zflip>0) ? "bottom" : "top") << " caps"<<G4endl;
 	G4LogicalVolume* logicWCPMT = ConstructPMT(WCPMTName, thecollectionName, "tank");
