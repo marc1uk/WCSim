@@ -36,7 +36,7 @@
 
 // when loading dirt primaries, skip entries that are from upstream rock interactions. 
 #ifndef ONLY_TANK_EVENTS
-#define ONLY_TANK_EVENTS
+//#define ONLY_TANK_EVENTS
 #endif
 
 // as help for reconstruction, a sample where light is only from muons, no other primary particles from the event.

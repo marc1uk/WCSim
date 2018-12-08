@@ -35,7 +35,7 @@
 //#define HYPER_VERBOSITY
 #endif
 
-const double WCSimWCTriggerBase::offset = 0.;//950.0; // ns. apply offset to the digit time
+const float WCSimWCTriggerBase::offset = 0.;//950.0; // ns. apply offset to the digit time
 const double WCSimWCTriggerBase::LongTime = 1E6; // ns = 1ms. event time
 
 
@@ -495,10 +495,10 @@ void WCSimWCTriggerBase::FillDigitsCollection(WCSimWCDigitsCollection* WCDCPMT, 
       for (std::map<int,float>::const_iterator digit_time_it = (*WCDCPMT)[i]->GetTimeMapBegin();
                digit_time_it!=(*WCDCPMT)[i]->GetTimeMapEnd(); digit_time_it++) {
         int ip = digit_time_it->first;
-	int digit_time=0;
+	G4float digit_time=0;
 	try{
 	  G4float temp_time = (*WCDCPMT)[i]->GetTime(ip);
-	  if(temp_time<(std::numeric_limits<int>::max())) {digit_time = (int)temp_time;} else {digit_time=-999;}
+	  if(temp_time<(std::numeric_limits<float>::max())) {digit_time = temp_time;} else {digit_time=-999;}
 	}
 	catch (...){
 	  G4cerr<<"Exception in WCSimWCTriggerBase::FillDigitsCollection call to WCSimWCDigi::GetTime "
@@ -514,7 +514,7 @@ void WCSimWCTriggerBase::FillDigitsCollection(WCSimWCDigitsCollection* WCDCPMT, 
 
 	  //first apply time offsets
 	  float peSmeared = (*WCDCPMT)[i]->GetPe(ip);
-	  G4double digihittime = 
+	  float digihittime = 
 	     -triggertime + WCSimWCTriggerBase::offset +	// temporarily disable for Bonsai
 	     digit_time;
 

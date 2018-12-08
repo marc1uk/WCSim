@@ -98,7 +98,7 @@ public:
   void SaveOptionsToOutput(WCSimRootOptions * wcopt);
   
   // get legacy digit time offset, for accounting in EndOfEventAction
-  double GetWCTriggerOffset(){return offset;}
+  float GetWCTriggerOffset(){return offset;}
   
 protected:
 
@@ -222,7 +222,7 @@ private:
     }//i
   }
   
-  static const double offset;        ///< Hit time offset (ns)
+  static const float offset;        ///< Hit time offset (ns)
   static const double LongTime;      ///< An arbitrary long time to use in loops (ns)
 
   bool   digitizeCalled; ///< Has Digitize() been called yet?
