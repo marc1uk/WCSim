@@ -492,9 +492,22 @@ void WCSimWCTriggerBase::FillDigitsCollection(WCSimWCDigitsCollection* WCDCPMT, 
     for (G4int i = 0; i < WCDCPMT->entries(); i++) {
       int tube=(*WCDCPMT)[i]->GetTubeID();
       //loop over digits in this PMT
-      for (std::map<int,float>::const_iterator digit_time_it = (*WCDCPMT)[i]->GetTimeMapBegin();
-               digit_time_it!=(*WCDCPMT)[i]->GetTimeMapEnd(); digit_time_it++) {
+      // The format of the loop iteration this time is a little unconventional, because erasing elements
+      // (via RemoveDigitizedGate) during iteration would normally invalidate the iterators.
+      // This format is safe.
+      for (std::map<int,float>::const_iterator digit_time_it = (*WCDCPMT)[i]->GetTimeMapBegin(), 
+           next_digit_it=digit_time_it;
+           digit_time_it!=(*WCDCPMT)[i]->GetTimeMapEnd();
+           digit_time_it = next_digit_it){
+        ++next_digit_it;
         int ip = digit_time_it->first;
+        G4float time_from_it=-999;
+        try{
+          time_from_it = digit_time_it->second;
+        }
+        catch (...){
+          G4cerr<<"Exception in WCSimWCTriggerBase::AlgNDigits trying to retrieve digit time from iterator"<<G4endl;
+        }
 	G4float digit_time=0;
 	try{
 	  G4float temp_time = (*WCDCPMT)[i]->GetTime(ip);
@@ -504,7 +517,8 @@ void WCSimWCTriggerBase::FillDigitsCollection(WCSimWCDigitsCollection* WCDCPMT, 
 	  G4cerr<<"Exception in WCSimWCTriggerBase::FillDigitsCollection call to WCSimWCDigi::GetTime "
 	        <<G4endl<<"Attempt to retrieve time from pe "<<ip<<" in WCDCPMT entry "<<i<<G4endl;
 	  G4cerr<<"The digi had "<<(*WCDCPMT)[i]->GetTotalPe()<<" total pe's."<<G4endl;
-	  //assert(false);
+	  G4cerr<<"Time retrieved from iterator was "<<time_from_it<<G4endl;
+	  assert(false);
 	  digit_time=-996;
 	}
 	if(digit_time >= lowerbound && digit_time <= upperbound) {
