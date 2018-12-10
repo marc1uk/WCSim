@@ -20,7 +20,7 @@
 #include "WCSimEnumerations.hh"
 
 class TDirectory;
-
+class WCSimRootEvent;
 
 class WCSimRootTrack : public TObject {
 
@@ -313,6 +313,7 @@ class WCSimRootTrigger : public TObject {
 
 private:
   WCSimRootEventHeader    fEvtHdr;  // The header
+  WCSimRootEvent*         fParentEvent; //! a link back to the parent, set when trigger is retrieved
   // See jhfNtuple.h for the meaning of these data members:
   Int_t                fMode;
   Int_t                fNvtxs;
@@ -358,6 +359,7 @@ public:
 
   void          Clear(Option_t *option ="");
   static void   Reset(Option_t *option ="");
+  void Print(int verbosity=0, int maxprimariestoprint=10, int maxtrackstoprint=10, int maxdigitstoprint=10, int maxphotonsperdigittoprint=5, int maxphotonstoprint=5);
 
   void          SetHeader(Int_t i, Int_t run, Int_t date,Int_t subevtn=1);
   void          SetTriggerInfo(TriggerType_t trigger_type, std::vector<Float_t> trigger_info);
@@ -386,6 +388,7 @@ public:
                                    Float_t dir[3],
                                    Float_t energy,
                                    Int_t id);
+  void          SetParentEvent(WCSimRootEvent* parenteventin){ fParentEvent = parenteventin; }
 
 
   WCSimRootEventHeader *GetHeader()               {return &fEvtHdr; }
@@ -409,6 +412,7 @@ public:
   Float_t             GetSumQ()               const { return fSumQ;}
   TriggerType_t       GetTriggerType()        const { return fTriggerType;}
   std::vector<Float_t> GetTriggerInfo()        const { return fTriggerInfo;}
+  WCSimRootEvent*     GetParentEvent()        const {return fParentEvent;}
 
   WCSimRootTrack         *AddTrack(Int_t ipnu, 
 				   Int_t flag, 
@@ -465,9 +469,14 @@ public:
   void          Clear(Option_t *option ="");
   static void   Reset(Option_t *option ="");
   Int_t GetCurrentIndex() { return Current;}
+  void Print(int verbosity=0, int maxtriggerstoprint=10, int maxprimariestoprint=10, int maxtrackstoprint=10, int maxdigitstoprint=10, int maxphotonsperdigittoprint=5, int maxphotonstoprint=5);
 
   //  WCSimRootTrigger* GetTrigger(int number) { return fEventList[number];}
-  WCSimRootTrigger* GetTrigger(int number) { return (WCSimRootTrigger*) (*fEventList)[number];}
+  WCSimRootTrigger* GetTrigger(int number) {
+    WCSimRootTrigger* thetrigger = (WCSimRootTrigger*) (*fEventList)[number];
+    thetrigger->SetParentEvent(this);
+    return thetrigger;
+  }
 
   Int_t GetNumberOfEvents() const { return fEventList->GetEntriesFast();}
   Int_t GetNumberOfSubEvents() const { return (fEventList->GetEntriesFast()-1);}

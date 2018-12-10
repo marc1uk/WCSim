@@ -282,7 +282,7 @@ void WCSimWCDigitizerSKI::DigitizeHits(WCSimWCDigitsCollection* WCHCPMT) {
 	  if(ip==0) {
 	    intgr_start=time;
 	    peSmeared = 0;
-	    //Set the limits of the integration window [intgr_start,upperlimit]                                                                                            
+	    //Set the limits of the integration window [intgr_start,upperlimit]
 	    upperlimit = intgr_start + DigitizerIntegrationWindow;
 	  }
 	  
