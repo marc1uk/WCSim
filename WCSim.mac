@@ -263,7 +263,7 @@
 #/gps/particle opticalphoton
 #/gps/number 1000
 ## place bomb at centre of tank
-#/gps/pos/centre 0 -14.46 168.1 cm
+#/gps/pos/centre 0 -14.46487518 168.1 cm
 #/gps/ang/type iso
 ## energy equivalent to 430nm
 #/gps/energy 2.883353 eV

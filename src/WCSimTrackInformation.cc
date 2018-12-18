@@ -10,6 +10,8 @@ WCSimTrackInformation::WCSimTrackInformation(const G4Track* /*atrack*/)
   primaryParentID=-1;
   //numreflections=0;
 }
+long long int WCSimTrackInformation::numscatters = 0;
+std::map<std::string,int> WCSimTrackInformation::scatterings = std::map<std::string,int>{};
 
 void WCSimTrackInformation::Print() const
 {

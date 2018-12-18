@@ -32,6 +32,7 @@ WCSimTrackingAction::WCSimTrackingAction(){
   ParticleList.insert(-14);  // nubar_mu
   ParticleList.insert(2112); // neutron
   ParticleList.insert(2212); // proton
+  ParticleList.insert(100);  // photon XXX FIXME 
 //  ParticleList.insert(11);   // e-    // do not save electrons unless they are from Decay process (mu decay)
 //  ParticleList.insert(-11);  // e+
 //  Don't put gammas there or there'll be too many -  we can add an energy cut later
@@ -41,7 +42,7 @@ WCSimTrackingAction::WCSimTrackingAction(){
 WCSimTrackingAction::~WCSimTrackingAction(){;}
 
 void WCSimTrackingAction::PreUserTrackingAction(const G4Track* aTrack){
-  G4float percentageOfCherenkovPhotonsToDraw = 0.0;
+  G4float percentageOfCherenkovPhotonsToDraw = 100.0; // XXX FIXME
   
   if (aTrack->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition()
        || G4UniformRand() < percentageOfCherenkovPhotonsToDraw){
@@ -52,14 +53,22 @@ void WCSimTrackingAction::PreUserTrackingAction(const G4Track* aTrack){
       fpTrackingManager->SetStoreTrajectory(false);
   }
   
-  /*
+  // XXX TEMP DISABLE ME XXX
   // implemented to allow photon tracks to be drawn during photon debugging, 
   // but interferes with saving of primary information.
   WCSimTrackInformation* anInfo = new WCSimTrackInformation();
   G4Track* theTrack = (G4Track*)aTrack;
   anInfo->WillBeSaved(false);
+  anInfo->SetPrimaryParentID(aTrack->GetTrackID());
   theTrack->SetUserInformation(anInfo);
-  */
+  // XXX TEMP END DISABLE XXX
+  
+  // clear scattering info as they are static members of the class. 
+  // N.B. this requires photons will be tracked from generation to absorption in one go.
+  if (aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition() ){
+    WCSimTrackInformation::numscatters=0;
+    WCSimTrackInformation::scatterings.clear();
+  }
 }
 
 void WCSimTrackingAction::PostUserTrackingAction(const G4Track* aTrack){
@@ -98,7 +107,7 @@ void WCSimTrackingAction::PostUserTrackingAction(const G4Track* aTrack){
   }
   
   // for primary particles, set the ParentID to the track's own ID
-  if(aTrack->GetParentID()==0 && aTrack->GetDefinition()!=G4OpticalPhoton::OpticalPhotonDefinition()){
+  if(aTrack->GetParentID()==0 /*&& aTrack->GetDefinition()!=G4OpticalPhoton::OpticalPhotonDefinition()*/){ //XXX
     anInfo->SetPrimaryParentID(aTrack->GetTrackID());
   }
   
@@ -118,7 +127,7 @@ void WCSimTrackingAction::PostUserTrackingAction(const G4Track* aTrack){
   }
   
   // Pass the information to the Trajectory, used by EndOfEventAction
-  if ( aTrack->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition()){
+  if ( aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()){ /// XXX FIXME
     G4ThreeVector currentPosition      = aTrack->GetPosition();
     G4VPhysicalVolume* currentVolume   = aTrack->GetVolume();
     G4double currentTime               = aTrack->GetGlobalTime();

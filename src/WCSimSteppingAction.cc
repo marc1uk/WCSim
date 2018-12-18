@@ -1,6 +1,7 @@
 /* vim:set noexpandtab tabstop=4 wrap */
 #include <stdlib.h>
 #include <stdio.h>
+#include <map>
 
 #include "WCSimSteppingAction.hh"
 #include "G4ParticleDefinition.hh"
@@ -15,6 +16,7 @@
 #include "G4SDManager.hh"
 #include "G4RunManager.hh"
 #include "G4OpBoundaryProcess.hh"
+#include "WCSimTrackInformation.hh"
 
 
 void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
@@ -88,6 +90,20 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
    }
    
    if ( track->GetCurrentStepNumber() == 1 ) fExpectedNextStatus = Undefined;
+   
+   G4String processname = aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
+   if(processname!="Transportation"){
+     // just for printing, keep a static list of all photon processes encountered and show new ones
+     static std::map<std::string,int> photonprocesses;
+     if(photonprocesses.count(processname)==0){
+       photonprocesses.emplace(processname,1);
+       G4cout<<"################ photon non-transportation process : "<<processname<<"################\n";
+     }
+     
+     // add the scattering info to the photon
+     WCSimTrackInformation::IncrementScatterings();
+     WCSimTrackInformation::AddProcess(processname);
+   }
    
    if( aStep->GetPostStepPoint()->GetStepStatus()==fGeomBoundary){
      G4OpBoundaryProcessStatus boundaryStatus=boundary->GetStatus();

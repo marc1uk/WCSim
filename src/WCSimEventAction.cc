@@ -57,6 +57,7 @@
 #define _SAVE_RAW_HITS
 #ifndef _SAVE_RAW_HITS_VERBOSE
 //#define _SAVE_RAW_HITS_VERBOSE
+//#define NPMTS_VERBOSE 10
 #endif
 #endif
 #ifndef SAVE_DIGITS_VERBOSE
@@ -64,10 +65,6 @@
 #endif
 #ifndef TIME_DAQ_STEPS
 //#define TIME_DAQ_STEPS
-#endif
-
-#ifndef NPMTS_VERBOSE
-//#define NPMTS_VERBOSE 10
 #endif
 
 #ifndef HYPER_VERBOSITY
@@ -623,13 +620,13 @@ void WCSimEventAction::EndOfEventAction(const G4Event* evt)
         } //id
 #ifdef _SAVE_RAW_HITS_VERBOSE
         if(digi_tubeid < NPMTS_VERBOSE) {
-          G4cout << "Adding " << truetime2.size()
+          G4cout << "Adding " << lappdhit_truetime2.size()
                  << " Cherenkov hits in tube " << digi_tubeid
                  << " with truetime:smeartime:primaryparentID";
-          for(G4int id = 0; id < truetime2.size(); id++) {
-             G4cout << " " << truetime[id]
-                    << ":" << smeartime[id]
-                    << ":" << primaryParentID[id];
+          for(G4int id = 0; id < lappdhit_truetime2.size(); id++) {
+             G4cout << " " << lappdhit_truetime2[id]
+                    << ":" << lappdhit_smeartime2[id]
+                    << ":" << lappdhit_primaryParentID2[id];
           }//id
          G4cout << G4endl;
         }
@@ -1531,16 +1528,24 @@ void WCSimEventAction::FillRootEvent(G4int event_id,
     wcsimrootevent->SetNumTubesHit(WCDC_hits->entries());
     std::vector<float> truetime, smeartime;
     std::vector<int>   primaryParentID;
+    std::vector<long long int> numscatters;
+    std::vector<std::map<std::string,int> > scatterings;
     double hit_time_smear, hit_time_true;
     int hit_parentid;
+    long long int hit_numscatters;
+    std::map<std::string,int> hit_scatterings;
     //loop over the DigitsCollection
     for(int idigi = 0; idigi < WCDC_hits->entries(); idigi++) {
       int digi_tubeid = (*WCDC_hits)[idigi]->GetTubeID();
       for(G4int id = 0; id < (*WCDC_hits)[idigi]->GetTotalPe(); id++){
 	hit_time_true  = (*WCDC_hits)[idigi]->GetPreSmearTime(id);
 	hit_parentid = (*WCDC_hits)[idigi]->GetParentID(id);
+	hit_numscatters = (*WCDC_hits)[idigi]->GetNumScatterings(id);
+	hit_scatterings = (*WCDC_hits)[idigi]->GetScatterings(id);
 	truetime.push_back(hit_time_true);
 	primaryParentID.push_back(hit_parentid);
+	numscatters.push_back(hit_numscatters);
+	scatterings.push_back(hit_scatterings);
 #ifdef _SAVE_RAW_HITS_VERBOSE
 	hit_time_smear = (*WCDC_hits)[idigi]->GetTime(id);
 	smeartime.push_back(hit_time_smear);
@@ -1561,10 +1566,15 @@ void WCSimEventAction::FillRootEvent(G4int event_id,
 #endif
       wcsimrootevent->AddCherenkovHit(digi_tubeid,
 				      truetime,
-				      primaryParentID);
+				      primaryParentID,
+				      numscatters,
+				      scatterings);
       smeartime.clear();
       truetime.clear();
       primaryParentID.clear();
+      numscatters.clear();
+      scatterings.clear();
+
     }//idigi
   }//if(WCDC_hits)
 #endif //_SAVE_RAW_HITS

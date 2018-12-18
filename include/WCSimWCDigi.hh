@@ -71,6 +71,8 @@ private:
   std::map<int, std::vector<int> > fDigiComp;
   std::map<int, G4int>    primaryParentID; ///< Primary parent ID of the Hit (do not use for Digits)
   std::map<int, G4int>    stripno;
+  std::map<int, long long int> fNumScatterings;
+  std::map<int, std::map<std::string, int> > fScatterings;
   std::map<int, std::map<int,double>> neigh_strips_peaks;
   std::map<int, std::map<int,double>> neigh_strips_times;
   std::map<int, std::map<int,double>> neigh_strips_lefttimes;
@@ -96,6 +98,8 @@ public:
   inline void SetTime(G4int gate, G4float T)    {time[gate]   = T;};
   inline void SetPreSmearTime(G4int gate, G4float T)    {time_presmear[gate]   = T;};
   inline void SetParentID(G4int gate, G4int parent) { primaryParentID[gate] = parent; };
+  inline void SetNumScatters(G4int gate, long long int numscatters) { fNumScatterings[gate] = numscatters; };
+  inline void SetScatterings(G4int gate, std::map<std::string,int> scats) {fScatterings[gate] = scats; };
   inline void SetStripNo(G4int gate, G4int strip){ stripno[gate] = strip; };
   inline void SetNeighStripNo(G4int gate, std::map<int,double> neighstrip ){ neigh_strips_peaks[gate]=neighstrip; };
   inline void SetNeighStripTime(G4int gate, std::map<int,double> neighstriptime ){ neigh_strips_times[gate]=neighstriptime; };
@@ -115,6 +119,8 @@ public:
 
   inline G4int   GetParentID(int gate) { return primaryParentID.at(gate);};
   inline G4float GetGateTime(int gate) { return TriggerTimes.at(gate);}
+  inline long long int GetNumScatterings(int gate){ return fNumScatterings[gate];}
+  inline std::map<std::string,int> GetScatterings(int gate){ return fScatterings[gate];}
   inline G4int   GetTubeID() {return tubeID;};
   inline G4int   GetLAPPDID() {return lappdID;};
   inline G4float GetPe(int gate)     {return pe.at(gate);};
@@ -180,6 +186,9 @@ public:
     int i, j;
     float index_time,index_timepresmear,index_pe;
     int index_primaryparentid;
+    long long int num_scatterings;
+    std::map<std::string,int> photon_scatterings;
+    bool sort_scatters = (fScatterings.size()==time.size());
     std::vector<int> index_digicomp;
     bool sort_digi_compositions = (fDigiComp.size()==time.size());
     // SortHitTimes is called by WCSimWCDigitizerSKI::DigitizeHits to sort the WCRawPMTSignalCollection.
@@ -193,11 +202,19 @@ public:
         index_pe = pe.at(i);
         if(sort_digi_compositions) index_digicomp = fDigiComp.at(i);
         index_primaryparentid = primaryParentID.at(i);
+        if(sort_scatters){
+          num_scatterings = fNumScatterings.at(i);
+          photon_scatterings = fScatterings.at(i);
+        }
         for (j = i; j > 0 && time.at(j-1) > index_time; j--) {
           time.at(j) = time.at(j-1);
           pe.at(j) = pe.at(j-1);
           if(sort_digi_compositions) fDigiComp.at(j) = fDigiComp.at(j-1);
           primaryParentID.at(j) = primaryParentID.at(j-1);
+          if(sort_scatters){
+            fNumScatterings.at(j) = fNumScatterings.at(j-1);
+            fScatterings.at(j) = fScatterings.at(j-1);
+          }
           //G4cout <<"swapping "<<time[j-1]<<" "<<index_time<<G4endl;
         }
         time.at(j) = index_time;
@@ -205,6 +222,10 @@ public:
         pe.at(j) = index_pe;
         if(sort_digi_compositions) fDigiComp.at(j) = index_digicomp;
         primaryParentID.at(j) = index_primaryparentid;
+        if(sort_scatters){
+          fNumScatterings.at(j) = num_scatterings;
+          fScatterings.at(j) = photon_scatterings;
+        }
       }
   }
   

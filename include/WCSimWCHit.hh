@@ -66,8 +66,10 @@ class WCSimWCHit : public G4VHit
   void SetPos          (G4ThreeVector xyz)          { pos = xyz; };
   void SetRot          (G4RotationMatrix rotMatrix) { rot = rotMatrix; };
   void SetLogicalVolume(G4LogicalVolume* logV)      { pLogV = logV;}
-  void AddParentID     (G4int primParentID)
-  { primaryParentID.push_back(primParentID); }
+  void AddParentID     (G4int primParentID)         { primaryParentID.push_back(primParentID); }
+  void AddHitNScatters (long long int numscats)     { numscatters.push_back(numscats); }
+  void AddHitScatters (std::map<std::string, int> scats) { scatterings.push_back(scats); }
+
 
   // This is temporarily used for the drawing scale
   void SetMaxPe(G4int number = 0)  {maxPe   = number;};
@@ -94,6 +96,8 @@ class WCSimWCHit : public G4VHit
   G4int         GetTotalPe()    { return totalPe;};
   G4float       GetTime(int i)  { return time.at(i);};
   G4int         GetParentID(int i) { return primaryParentID.at(i);};
+  long long int GetNumScatterings(int i){ return numscatters.at(i);};
+  std::map<std::string,int> GetScatterings(int i){ return scatterings.at(i);};
   
   G4LogicalVolume* GetLogicalVolume() {return pLogV;};
 
@@ -169,6 +173,8 @@ class WCSimWCHit : public G4VHit
   std::vector<G4float>  time;
   std::vector<G4int>    primaryParentID;
   G4int                 totalPeInGate;
+  std::vector<long long int> numscatters;
+  std::vector<std::map<std::string,int> > scatterings;
 };
 
 typedef G4THitsCollection<WCSimWCHit> WCSimWCHitsCollection;

@@ -40,8 +40,8 @@
 WCSimWCDigitizerBase::WCSimWCDigitizerBase(G4String name,
 					   WCSimDetectorConstruction* inDetector,
 					   WCSimWCDAQMessenger* myMessenger,
-					   DigitizerType_t digitype, G4String detectorElement)
-  :G4VDigitizerModule(name), myDetector(inDetector), DAQMessenger(myMessenger), DigitizerType(digitype), detectorElement(detectorElement), DigitizerClassName("")
+					   DigitizerType_t digitype, G4String detectorElementin)
+  :G4VDigitizerModule(name), myDetector(inDetector), DAQMessenger(myMessenger), DigitizerType(digitype), detectorElement(detectorElementin), DigitizerClassName("")
 {
   G4String colName;
   if(detectorElement=="tank"){
@@ -133,7 +133,7 @@ void WCSimWCDigitizerBase::Digitize()
 
 }
 
-bool WCSimWCDigitizerBase::AddNewDigit(int tube, int gate, float digihittime, float peSmeared, std::vector<int> digi_comp)
+bool WCSimWCDigitizerBase::AddNewDigit(int tube, int gate, float digihittime, float peSmearedin, std::vector<int> digi_comp)
 {
 
   //gate is not a trigger, but just the position of the digit in the array
@@ -141,7 +141,7 @@ bool WCSimWCDigitizerBase::AddNewDigit(int tube, int gate, float digihittime, fl
 #ifdef WCSIMWCDIGITIZER_VERBOSE
   if(tube < NPMTS_VERBOSE) {
     G4cout<<"Adding hit "<<gate<<" in tube "<<tube
-	  << " with time " << digihittime << " charge " << peSmeared
+	  << " with time " << digihittime << " charge " << peSmearedin
 	  << " (made of " << digi_comp.size() << " raw hits with IDs ";
     for(unsigned int iv = 0; iv < digi_comp.size(); iv++)
       G4cout << " " << digi_comp[iv] << ",";
@@ -149,11 +149,11 @@ bool WCSimWCDigitizerBase::AddNewDigit(int tube, int gate, float digihittime, fl
   }
 #endif
 
-  if (peSmeared > 0.0) {
+  if (peSmearedin > 0.0) {
       if ( DigiStoreHitMap[tube] == 0) {
 	WCSimWCDigi* Digi = new WCSimWCDigi();
 	Digi->SetTubeID(tube);
-	Digi->SetPe(gate,peSmeared);
+	Digi->SetPe(gate,peSmearedin);
 	Digi->AddPe(digihittime);
 	Digi->SetTime(gate,digihittime);
 	Digi->AddDigiCompositionInfo(digi_comp);
@@ -164,7 +164,7 @@ bool WCSimWCDigitizerBase::AddNewDigit(int tube, int gate, float digihittime, fl
 #endif
       }
       else {
-	(*DigiStore)[DigiStoreHitMap[tube]-1]->SetPe(gate,peSmeared);
+	(*DigiStore)[DigiStoreHitMap[tube]-1]->SetPe(gate,peSmearedin);
 	(*DigiStore)[DigiStoreHitMap[tube]-1]->SetTime(gate,digihittime);
 	(*DigiStore)[DigiStoreHitMap[tube]-1]->AddPe(digihittime);
 	(*DigiStore)[DigiStoreHitMap[tube]-1]->AddDigiCompositionInfo(digi_comp);
@@ -174,11 +174,11 @@ bool WCSimWCDigitizerBase::AddNewDigit(int tube, int gate, float digihittime, fl
 #endif
       }
       return true;
-  }//peSmeared > 0
+  }//peSmearedin > 0
   else {
 #ifdef WCSIMWCDIGITIZER_VERBOSE
     if(tube < NPMTS_VERBOSE)
-      G4cout << "DIGIT REJECTED with charge " << peSmeared
+      G4cout << "DIGIT REJECTED with charge " << peSmearedin
 	     << " time " << digihittime << G4endl;
 #endif
     return false;

@@ -449,7 +449,8 @@ void WCSimRootTrack::Clear(Option_t* /*o*/){
 
 //_____________________________________________________________________________
 
-WCSimRootCherenkovHit *WCSimRootTrigger::AddCherenkovHit(Int_t tubeID,std::vector<Float_t> truetime,std::vector<Int_t> primParID)
+WCSimRootCherenkovHit *WCSimRootTrigger::AddCherenkovHit(Int_t tubeID,std::vector<Float_t> truetime,std::vector<Int_t> primParID, std::vector<long long int> numscatters, std::vector<std::map<std::string,int> > processes)
+
 {
   // Add a new Cherenkov hit to the list of Cherenkov hits
   TClonesArray &cherenkovhittimes = *fCherenkovHitTimes;
@@ -459,7 +460,8 @@ WCSimRootCherenkovHit *WCSimRootTrigger::AddCherenkovHit(Int_t tubeID,std::vecto
     fCherenkovHitCounter++;
 
     WCSimRootCherenkovHitTime *cherenkovhittime = 
-      new(cherenkovhittimes[fNcherenkovhittimes++]) WCSimRootCherenkovHitTime(truetime[i],primParID[i]);
+      new(cherenkovhittimes[fNcherenkovhittimes++]) WCSimRootCherenkovHitTime(truetime[i],primParID[i], 
+      numscatters[i], processes[i]);
   }
 
   Int_t WC_Index[2];
@@ -487,11 +489,15 @@ WCSimRootCherenkovHit::WCSimRootCherenkovHit(Int_t tubeID,
 }
 
 WCSimRootCherenkovHitTime::WCSimRootCherenkovHitTime(Float_t truetime,
-						     Int_t primParID)
+                                                    Int_t primParID,
+                                                    long long int numscatters,
+                                                    std::map<std::string, int> processes)
 {
   // Create a WCSimRootCherenkovHit object and fill it with stuff
     fTruetime        = truetime; 
     fPrimaryParentID = primParID;
+    fNumScatterings = numscatters;
+    fScatterings     = processes;
 }
 
 //_____________________________________________________________________________
