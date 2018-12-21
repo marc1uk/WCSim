@@ -18,6 +18,8 @@
 #include "G4OpBoundaryProcess.hh"
 #include "WCSimTrackInformation.hh"
 
+const double SPEED_OF_LIGHT=299.792458; // mm/ns - match time and position units of G4SystemOfUnits
+const double REF_INDEX_WATER=1.32885;   // minimum value: gives longest possible time
 
 void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
 {
@@ -76,6 +78,18 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
 //  }
   
   if(track->GetDefinition()==G4OpticalPhoton::OpticalPhotonDefinition()){
+  
+//   if(aStep->IsFirstStepInVolume()){  // FIXME: kill photon if no RINDEX. Should be automatic?!
+//     G4MaterialPropertyVector* RindexVector=nullptr;
+//     G4MaterialPropertiesTable* aMaterialPropertiesTable = track->GetMaterial()->GetMaterialPropertiesTable();
+//     if(aMaterialPropertiesTable) RindexVector = aMaterialPropertiesTable->GetProperty("RINDEX");
+//     if(RindexVector==nullptr){
+//       track->SetTrackStatus(fStopAndKill);  // don't know why it's allowing photons to be transported
+//       fExpectedNextStatus=Undefined;        // in materials with no Rindex
+//       return;
+//     }
+//   }
+    
    //G4cout<<"optical photon StepStatus is          "<<thePostPoint->GetStepStatus()<<G4endl
    //      <<"               fExpectedNextStatus is "<<fExpectedNextStatus<<G4endl
    //      <<"               boundaryStatus is      "<<boundary->GetStatus()<<G4endl;
@@ -92,17 +106,139 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
    if ( track->GetCurrentStepNumber() == 1 ) fExpectedNextStatus = Undefined;
    
    G4String processname = aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
-   if(processname!="Transportation"){
-     // just for printing, keep a static list of all photon processes encountered and show new ones
-     static std::map<std::string,int> photonprocesses;
-     if(photonprocesses.count(processname)==0){
-       photonprocesses.emplace(processname,1);
-       G4cout<<"################ photon non-transportation process : "<<processname<<"################\n";
+   // reflections still count as "transportation", so we need to check it separately
+   if( aStep->GetPostStepPoint()->GetStepStatus()==fGeomBoundary){
+     G4OpBoundaryProcessStatus boundaryStatus=boundary->GetStatus();
+     std::string boundaryprocessname = ToName(boundaryStatus);
+     if( processname=="Transportation" && 
+         ( (boundaryprocessname.find("Reflection") != std::string::npos) ||
+           (boundaryprocessname.find("Scattering") != std::string::npos) 
+         )
+       ){
+         processname  = boundaryprocessname + "_";
+         processname += aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName();
+         processname += "_";
+         processname += aStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
      }
+   }
+//   if(processname=="FresnelReflection"){
+//     G4cerr<<"FresnelReflection between "
+//           <<aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName()
+//           << " and "
+//           <<aStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()
+//           <<G4endl;
+//   }
+   
+   static double totaltrackingtime=0;
+   static std::vector<double> steptimes;
+   static std::vector<double> steplengths;
+   static std::vector<double> stepspeeds;
+   static std::vector<std::string> stepvols;
+   static std::vector<std::string> stepprocesses;
+   static std::vector<std::array<double, 3>> stepdirs;
+   double steptimelength = aStep->GetDeltaTime();
+   double stepspacelength = aStep->GetStepLength();
+   if ( track->GetCurrentStepNumber() == 1 ){
+     totaltrackingtime=aStep->GetDeltaTime();
+     steptimes.clear();
+     steplengths.clear();
+     stepspeeds.clear();
+     stepvols.clear();
+     stepprocesses.clear();
+     stepdirs.clear();
+   }
+   else { totaltrackingtime += steptimelength; }
+   
+   steptimes.push_back(steptimelength);
+   steplengths.push_back(stepspacelength);
+   stepspeeds.push_back((steptimelength>0) ? stepspacelength/steptimelength : 0);
+   stepvols.push_back(track->GetVolume()->GetName());
+   stepprocesses.push_back(processname);
+   stepdirs.push_back(std::array<double,3>{
+     aStep->GetPostStepPoint()->GetPosition().x() - aStep->GetPreStepPoint()->GetPosition().x(),
+     aStep->GetPostStepPoint()->GetPosition().y() - aStep->GetPreStepPoint()->GetPosition().y(),
+     aStep->GetPostStepPoint()->GetPosition().z() - aStep->GetPreStepPoint()->GetPosition().z()});
+   
+   WCSimTrackInformation::IncrementScatterings(); // use to count steps instead
+   
+   if(processname!="Transportation"){
+//     // just for printing, keep a static list of all photon processes encountered and show new ones
+//     static std::map<std::string,int> photonprocesses;
+//     if(photonprocesses.count(processname)==0){
+//       photonprocesses.emplace(processname,1);
+//       G4cout<<"################ photon non-transportation process : "<<processname<<"################\n";
+//     }
      
      // add the scattering info to the photon
-     WCSimTrackInformation::IncrementScatterings();
+     //WCSimTrackInformation::IncrementScatterings();
      WCSimTrackInformation::AddProcess(processname);
+   } else {
+     
+     if(steptimelength>0){ // avoid divide by 0 errors
+       const G4DynamicParticle* aParticle = track->GetDynamicParticle();
+       double thePhotonMomentum = aParticle->GetTotalMomentum();
+       double Rindex=-1;
+       G4MaterialPropertyVector* RindexVector=nullptr;
+       G4MaterialPropertiesTable* aMaterialPropertiesTable = track->GetMaterial()->GetMaterialPropertiesTable();
+       if(aMaterialPropertiesTable) RindexVector = aMaterialPropertiesTable->GetProperty("RINDEX");
+       if(RindexVector) Rindex = RindexVector->Value(thePhotonMomentum);
+       
+       double tankyoffset = -144.649; // mm
+       double tankzoffset = 1681;     // mm
+       
+       double distx = aStep->GetPostStepPoint()->GetPosition().x();
+       double disty = aStep->GetPostStepPoint()->GetPosition().y() - tankyoffset;
+       double distz = aStep->GetPostStepPoint()->GetPosition().z() - tankzoffset;
+       double absdist = sqrt(pow(distx,2.)+pow(disty,2.)+pow(distz,2.));
+       
+       double expectedsteptime = (stepspacelength*REF_INDEX_WATER/SPEED_OF_LIGHT);
+       
+//       if(abs(steptimelength-expectedsteptime)>8){  // only look at steps where a significant delay is incurred
+//         G4cerr<<"!!!! LONG STEP IN "<<track->GetVolume()->GetName()<<": speed of light should be "
+//               <<(SPEED_OF_LIGHT/REF_INDEX_WATER)<<" vs measured speed "<<(stepspacelength/steptimelength)
+//               <<", step length = "<<stepspacelength
+//               <<", expected duration = "<<(stepspacelength*REF_INDEX_WATER/SPEED_OF_LIGHT)
+//               <<", measured duration = "<<steptimelength
+//               <<", PostProcessDefinedStep = "<<processname
+//               <<", PreProcessDefinedStep = "<<aStep->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName()
+//               <<", Material name "<<track->GetMaterial()->GetName()
+//               <<", MPT is at "<<aMaterialPropertiesTable<<" with RINDEX "<<Rindex
+//               <<" at photon momentum "<<thePhotonMomentum
+//               <<G4endl;
+//               track->SetTrackStatus(fStopAndKill);  // so that it doesn't get picked up repeatedly
+//               fExpectedNextStatus=Undefined;
+//               return;
+//       }
+       
+//       if(abs(totaltrackingtime-(absdist*REF_INDEX_WATER/SPEED_OF_LIGHT))>8){
+//         G4cerr<<"!!!! LONG TOTAL STEP "<<track->GetCurrentStepNumber()<<" IN "<<track->GetVolume()->GetName()
+//               <<": speed of light should be "<<(SPEED_OF_LIGHT/REF_INDEX_WATER)
+//               <<" vs measured speed "<<(absdist/totaltrackingtime)
+//               <<", total distance = "<<absdist<<" in measured time = "<<totaltrackingtime
+//               <<", expected time = "<<(absdist*REF_INDEX_WATER/SPEED_OF_LIGHT)
+//               <<", ProcessDefinedStep = "<<aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()
+//               <<", Current material name "<<track->GetMaterial()->GetName()
+//               <<", MPT is at "<<aMaterialPropertiesTable<<" with RINDEX "<<Rindex
+//               <<" at photon momentum "<<thePhotonMomentum
+//               <<G4endl
+//               <<"Steps were: ";
+//               for(int stepi=0; stepi<steptimes.size(); ++stepi){
+//                 G4cerr<<"{ Time: "<<steptimes.at(stepi)<<", Length: "<<steplengths.at(stepi)
+//                       <<", Speed: "<<stepspeeds.at(stepi)
+//                       <<", Volume: "<<stepvols.at(stepi)
+//                       <<", Process: "<<stepprocesses.at(stepi)
+//                       <<", Dir: ("
+//                       <<stepdirs.at(stepi).at(0)<<", "
+//                       <<stepdirs.at(stepi).at(1)<<", "
+//                       <<stepdirs.at(stepi).at(2)<<") "
+//                       "}, ";
+//               }
+//               G4cerr<<G4endl;
+//               track->SetTrackStatus(fStopAndKill);  // so that it doesn't get picked up repeatedly
+//               fExpectedNextStatus=Undefined;
+//               return;
+//       }
+     }
    }
    
    if( aStep->GetPostStepPoint()->GetStepStatus()==fGeomBoundary){
@@ -265,10 +401,14 @@ double WCSimSteppingAction::FieldLines(G4double /*x*/,G4double /*y*/,G4int /*coo
   return 0;
 }
 
-G4String ToName(G4OpBoundaryProcessStatus boundaryStatus){
-G4String processnames[14]={"Undefined","FresnelRefraction","FresnelReflection","TotalInternalReflection","LambertianReflection","LobeReflection","SpikeReflection","BackScattering","Absorption","Detection","NotAtBoundary","SameMaterial","StepTooSmall","NoRINDEX"};
-return processnames[boundaryStatus];}
+G4String WCSimSteppingAction::ToName(G4OpBoundaryProcessStatus boundaryStatus){
+  static std::vector<G4String> processnames{"Undefined","FresnelRefraction","FresnelReflection",
+  "TotalInternalReflection",  "LambertianReflection","LobeReflection","SpikeReflection",
+  "BackScattering","Absorption","Detection","NotAtBoundary","SameMaterial","StepTooSmall","NoRINDEX"};
+  if(boundaryStatus<processnames.size()) return processnames.at(boundaryStatus);
+  else return std::to_string(boundaryStatus);
+}
 
-G4String ToName2(G4StepStatus stepStatus){
+G4String WCSimSteppingAction::ToName2(G4StepStatus stepStatus){
 G4String processnames[8]={"fWorldBoundary","fGeomBoundary","fAtRestDoItProc","fAlongStepDoItProc","fPostStepDoItProc","fUserDefinedLimit","fExclusivelyForcedProc","fUndefined"};
 return processnames[stepStatus];}

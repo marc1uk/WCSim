@@ -127,7 +127,7 @@ void WCSimTrackingAction::PostUserTrackingAction(const G4Track* aTrack){
   }
   
   // Pass the information to the Trajectory, used by EndOfEventAction
-  if ( aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()){ /// XXX FIXME
+  //if ( aTrack->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition()){ /// XXX FIXME
     G4ThreeVector currentPosition      = aTrack->GetPosition();
     G4VPhysicalVolume* currentVolume   = aTrack->GetVolume();
     G4double currentTime               = aTrack->GetGlobalTime();
@@ -140,7 +140,7 @@ void WCSimTrackingAction::PostUserTrackingAction(const G4Track* aTrack){
     currentTrajectory->SetStoppingMomentum(currentMomentum);
     currentTrajectory->SetParentPdg(anInfo->GetParentPdg());
     currentTrajectory->SetSaveFlag(anInfo->isSaved());
-  }
+  //}
   
   // report every 100000'th track, just to see progress
   static int line=0;

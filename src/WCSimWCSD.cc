@@ -186,6 +186,12 @@ G4bool WCSimWCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
       // Get information about the parent track
       // ======================================
       WCSimTrackInformation* trackinfo = (WCSimTrackInformation*)(aStep->GetTrack()->GetUserInformation());
+//      std::map<std::string,int> scatteringprocesses = trackinfo->GetScatterings();
+//      G4cerr<<"Photon hit with scatterings {";
+//      for(auto&& pair : scatteringprocesses){
+//        G4cerr<<pair.first<<":"<<pair.second<<", ";
+//      }
+//      G4cerr<<"}"<<G4endl;
       G4int primParentID;
       if (trackinfo){
         primParentID = trackinfo->GetPrimaryParentID();
