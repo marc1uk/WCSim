@@ -261,6 +261,8 @@ void WCSimWCDigitizerSKI::DigitizeHits(WCSimWCDigitsCollection* WCHCPMT) {
       int digi_unique_id   = 0;
       int photon_unique_id = 0;
       std::vector<int> digi_comp; 
+      std::vector<float> digi_time_comps_presmear;
+      std::vector<float> digi_time_comps_postsmear;
 
       //loop over the hits on this PMT
       for( G4int ip = 0 ; ip < (*WCHCPMT)[i]->GetTotalPe() ; ip++)
@@ -301,6 +303,8 @@ void WCSimWCDigitizerSKI::DigitizeHits(WCSimWCDigitsCollection* WCHCPMT) {
 	    peSmeared += pe;
 	    photon_unique_id = ip+absoluteindex;
 	    digi_comp.push_back(photon_unique_id);
+	    digi_time_comps_presmear.push_back((*WCHCPMT)[i]->GetPreSmearTime(ip));
+	    digi_time_comps_postsmear.push_back((*WCHCPMT)[i]->GetTime(ip));
 	    // extend the integration window, if enabled
 	    if(ExtendDigitizerIntegrationWindow) upperlimit = time + DigitizerIntegrationWindow;
       
@@ -331,11 +335,18 @@ void WCSimWCDigitizerSKI::DigitizeHits(WCSimWCDigitsCollection* WCHCPMT) {
 	    if(iflag == 0) {
 	      //digitize hit
 	      peSmeared *= efficiency;
+//	      G4cout<<"making digit with presmear times: {";
+//	      for(auto&& atime : digi_time_comps_presmear) G4cout<<atime<<", "; G4cout<<"}";
+	      //G4cout<<" and postsmear times: {";
+//	      G4cout<<"making digit at time "<<intgr_start<<" with postsmear times: {";
+//	      for(auto&& atime : digi_time_comps_postsmear) G4cout<<atime<<", "; G4cout<<"}"<<G4endl;
 	      bool accepted = WCSimWCDigitizerBase::AddNewDigit(tube, digi_unique_id, intgr_start, peSmeared, digi_comp);
 	      if(accepted) {
 		digi_unique_id++;
 	      }
 	      assert(digi_comp.size());
+	      digi_time_comps_presmear.clear();
+	      digi_time_comps_postsmear.clear();
 	      digi_comp.clear();
 	    }
 	    else {
@@ -345,6 +356,8 @@ void WCSimWCDigitizerSKI::DigitizeHits(WCSimWCDigitsCollection* WCHCPMT) {
 		G4cout << "DIGIT REJECTED with time " << intgr_start << G4endl;
 #endif
 	      digi_comp.clear();
+	      digi_time_comps_presmear.clear();
+	      digi_time_comps_postsmear.clear();
 	    }
 	  }
 	  
@@ -383,6 +396,8 @@ void WCSimWCDigitizerSKI::DigitizeHits(WCSimWCDigitsCollection* WCHCPMT) {
 		}
 		assert(digi_comp.size());
 		digi_comp.clear();
+		digi_time_comps_presmear.clear();
+		digi_time_comps_postsmear.clear();
 	      }
 	      else {
 		//reject hit
@@ -391,6 +406,8 @@ void WCSimWCDigitizerSKI::DigitizeHits(WCSimWCDigitsCollection* WCHCPMT) {
 		  G4cout << "DIGIT REJECTED with time " << intgr_start << G4endl;
 #endif
 		digi_comp.clear();
+		digi_time_comps_presmear.clear();
+		digi_time_comps_postsmear.clear();
 	      }
 	    }
 	  }

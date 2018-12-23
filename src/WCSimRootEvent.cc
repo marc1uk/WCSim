@@ -449,19 +449,21 @@ void WCSimRootTrack::Clear(Option_t* /*o*/){
 
 //_____________________________________________________________________________
 
-WCSimRootCherenkovHit *WCSimRootTrigger::AddCherenkovHit(Int_t tubeID,std::vector<Float_t> truetime,std::vector<Int_t> primParID, std::vector<long long int> numscatters, std::vector<std::map<std::string,int> > processes)
+WCSimRootCherenkovHit *WCSimRootTrigger::AddCherenkovHit(Int_t tubeID,std::vector<Float_t> truetime,std::vector<Float_t> smeartime,std::vector<Int_t> primParID, std::vector<long long int> numscatters, std::vector<std::map<std::string,int> > processes)
 
 {
   // Add a new Cherenkov hit to the list of Cherenkov hits
   TClonesArray &cherenkovhittimes = *fCherenkovHitTimes;
-
+  if(truetime.size()!=smeartime.size()){ std::cout<<"true and smear time size mismatch: "
+                                                  <<truetime.size()<<"/"<<smeartime.size()<<std::endl;
+  }
   for (unsigned int i =0;i<truetime.size();i++)
   {
     fCherenkovHitCounter++;
 
     WCSimRootCherenkovHitTime *cherenkovhittime = 
-      new(cherenkovhittimes[fNcherenkovhittimes++]) WCSimRootCherenkovHitTime(truetime[i],primParID[i], 
-      numscatters[i], processes[i]);
+      new(cherenkovhittimes[fNcherenkovhittimes++]) 
+         WCSimRootCherenkovHitTime(truetime[i],smeartime[i],primParID[i], numscatters[i], processes[i]);
   }
 
   Int_t WC_Index[2];
@@ -489,12 +491,14 @@ WCSimRootCherenkovHit::WCSimRootCherenkovHit(Int_t tubeID,
 }
 
 WCSimRootCherenkovHitTime::WCSimRootCherenkovHitTime(Float_t truetime,
+                                                    Float_t smeartime,
                                                     Int_t primParID,
                                                     long long int numscatters,
                                                     std::map<std::string, int> processes)
 {
   // Create a WCSimRootCherenkovHit object and fill it with stuff
     fTruetime        = truetime; 
+    fSmeartime       = smeartime;
     fPrimaryParentID = primParID;
     fNumScatterings = numscatters;
     fScatterings     = processes;

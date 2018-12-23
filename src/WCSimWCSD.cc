@@ -187,6 +187,7 @@ G4bool WCSimWCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
       // ======================================
       WCSimTrackInformation* trackinfo = (WCSimTrackInformation*)(aStep->GetTrack()->GetUserInformation());
 //      std::map<std::string,int> scatteringprocesses = trackinfo->GetScatterings();
+      //if(scatteringprocesses.size()>2) return false;
 //      G4cerr<<"Photon hit with scatterings {";
 //      for(auto&& pair : scatteringprocesses){
 //        G4cerr<<pair.first<<":"<<pair.second<<", ";
@@ -208,6 +209,7 @@ G4bool WCSimWCSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
       // Get information about the hit
       // =============================
       G4double hitTime           = preStepPoint->GetGlobalTime();
+      if(hitTime<0) G4cout<<"MAKING SD HIT WITH NEGATIVE TIME?!!"<<G4endl;
       G4double energyDeposition  = aStep->GetTotalEnergyDeposit();
       
       // Get information about the sensor

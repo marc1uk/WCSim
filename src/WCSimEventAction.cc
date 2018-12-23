@@ -1546,10 +1546,10 @@ void WCSimEventAction::FillRootEvent(G4int event_id,
 	primaryParentID.push_back(hit_parentid);
 	numscatters.push_back(hit_numscatters);
 	scatterings.push_back(hit_scatterings);
-#ifdef _SAVE_RAW_HITS_VERBOSE
+//#ifdef _SAVE_RAW_HITS_VERBOSE
 	hit_time_smear = (*WCDC_hits)[idigi]->GetTime(id);
 	smeartime.push_back(hit_time_smear);
-#endif
+//#endif
       }//id
 #ifdef _SAVE_RAW_HITS_VERBOSE
       if(digi_tubeid < NPMTS_VERBOSE) {
@@ -1566,6 +1566,7 @@ void WCSimEventAction::FillRootEvent(G4int event_id,
 #endif
       wcsimrootevent->AddCherenkovHit(digi_tubeid,
 				      truetime,
+				      smeartime,
 				      primaryParentID,
 				      numscatters,
 				      scatterings);

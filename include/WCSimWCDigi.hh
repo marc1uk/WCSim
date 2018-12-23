@@ -96,7 +96,7 @@ public:
   inline void AddGate(int g,float t) { Gates.insert(g); TriggerTimes.push_back(t);}
   inline void SetPe(G4int gate,  G4float Q)      {pe[gate]     = Q;};
   inline void SetTime(G4int gate, G4float T)    {time[gate]   = T;};
-  inline void SetPreSmearTime(G4int gate, G4float T)    {time_presmear[gate]   = T;};
+  inline void SetPreSmearTime(G4int gate, G4float T)    {time_presmear[gate]   = T; if(T<0) G4cout<<"###### SetPreSmearTime with negative time "<<T<<G4endl;};
   inline void SetParentID(G4int gate, G4int parent) { primaryParentID[gate] = parent; };
   inline void SetNumScatters(G4int gate, long long int numscatters) { fNumScatterings[gate] = numscatters; };
   inline void SetScatterings(G4int gate, std::map<std::string,int> scats) {fScatterings[gate] = scats; };
@@ -146,7 +146,7 @@ public:
   };
   inline std::map<int,float>::const_iterator GetTimeMapBegin() {return time.cbegin();}
   inline std::map<int,float>::const_iterator GetTimeMapEnd() {return time.cend();}
-  inline G4float GetPreSmearTime(int gate)   {return time_presmear.at(gate);};
+  inline G4float GetPreSmearTime(int gate)   {if(time_presmear.at(gate)<0) G4cout<<"### NEGATE PRESMEAR TIME "<<time_presmear.at(gate)<<" IN GETPRESMEARTIME"<<G4endl;  return time_presmear.at(gate);};
   std::vector<int> GetDigiCompositionInfo(int gate);
   inline std::map< int, std::vector<int> > GetDigiCompositionInfo(){return fDigiComp;}
   inline G4int   GetStripNo(int gate){ return stripno[gate];};
@@ -183,6 +183,18 @@ public:
 
 
   void SortDigiMapsByHitTime() {
+//    // alt method: make a vector of the sorted indexes
+//    // then make a copy of everything and reorder based on the ordering given by the sorted indexes
+//    std::map<int,float> timescopy = time;
+//    std::map<int,float> presmeartimescopy = time_presmear;
+//    std::map<int,float> pecopy = pe;
+//    std::map<int, G4int> parentidcopy = primaryParentID;
+//    std::map<int, long long int> nscatteringscopy = fNumScatterings;
+//    std::map<int, std::map<std::string, int> > scatteringscopy = fScatterings;
+//    std::map<int, std::vector<int> > digicompcopy = fDigiComp;
+//    bool sort_scatters = (fScatterings.size()==time.size());
+//    bool sort_digi_compositions = (fDigiComp.size()==time.size());
+    
     int i, j;
     float index_time,index_timepresmear,index_pe;
     int index_primaryparentid;
@@ -191,14 +203,20 @@ public:
     bool sort_scatters = (fScatterings.size()==time.size());
     std::vector<int> index_digicomp;
     bool sort_digi_compositions = (fDigiComp.size()==time.size());
-    // SortHitTimes is called by WCSimWCDigitizerSKI::DigitizeHits to sort the WCRawPMTSignalCollection.
+    // SortDigiMapsByHitTime is called by WCSimWCDigitizerSKI::DigitizeHits to sort the WCRawPMTSignalCollection.
     // Each entry in WCRawPMTSignalCollection represents the set of photon hits on a PMT.
     // Since a photon hit has no "composition", fDigiComp is empty at this time and needn't be sorted.
     // for generality, sort if the digi composition map has the same size as other maps
+//    G4cout<<"we have "<<time.size()<<" hits to sort: {";
+//    for(int printi=0; printi<time_presmear.size(); printi++){
+//      G4cout<<printi<<":"<<time_presmear.at(printi)<<", ";
+//    }
+//    G4cout<<"}"<<G4endl;
     for (i = 1; i < (int) time.size(); ++i)
       {
         index_time  = time.at(i);
         index_timepresmear  = time_presmear.at(i);
+        //G4cout<<"shuffling element "<<i<<":"<<index_timepresmear<<" down"<<G4endl;
         index_pe = pe.at(i);
         if(sort_digi_compositions) index_digicomp = fDigiComp.at(i);
         index_primaryparentid = primaryParentID.at(i);
@@ -207,7 +225,9 @@ public:
           photon_scatterings = fScatterings.at(i);
         }
         for (j = i; j > 0 && time.at(j-1) > index_time; j--) {
+          //G4cout <<"shifting up "<<(j-1)<<":"<<time_presmear.at(j-1)<<" > "<<i<<":"<<index_timepresmear<<G4endl;
           time.at(j) = time.at(j-1);
+          time_presmear.at(j) = time_presmear.at(j-1);
           pe.at(j) = pe.at(j-1);
           if(sort_digi_compositions) fDigiComp.at(j) = fDigiComp.at(j-1);
           primaryParentID.at(j) = primaryParentID.at(j-1);
@@ -215,10 +235,11 @@ public:
             fNumScatterings.at(j) = fNumScatterings.at(j-1);
             fScatterings.at(j) = fScatterings.at(j-1);
           }
-          //G4cout <<"swapping "<<time[j-1]<<" "<<index_time<<G4endl;
         }
         time.at(j) = index_time;
+        //G4cout<<"setting "<<j<<":"<<index_timepresmear;
         time_presmear.at(j) = index_timepresmear;
+        if(index_timepresmear<0) G4cout<<"#### NEGATIVE PRESMEAR TIME IN SORT"<<G4endl;
         pe.at(j) = index_pe;
         if(sort_digi_compositions) fDigiComp.at(j) = index_digicomp;
         primaryParentID.at(j) = index_primaryparentid;
@@ -226,7 +247,47 @@ public:
           fNumScatterings.at(j) = num_scatterings;
           fScatterings.at(j) = photon_scatterings;
         }
+        
+//        G4cout<<"updated times: {";
+//        for(int printi=0; printi<time_presmear.size(); printi++){
+//          G4cout<<time_presmear.at(printi)<<", ";
+//        }
+//        G4cout<<"}"<<G4endl;
       }
+      
+//    G4cout<<"sorted presmear times are: {";
+//    for(int i=0; i<time_presmear.size(); i++){
+//      G4cout<<time_presmear.at(i)<<", ";
+//    }
+//    G4cout<<"}, post-smear times are: {";
+//    for(int i=0; i<time.size(); i++){
+//      G4cout<<time.at(i)<<", ";
+//    }
+//    G4cout<<"}"<<G4endl;
+    
+//    // alt method:
+//    std::vector<float> timestosortby;
+//    for(auto&& atime : presmeartimescopy) timestosortby.push_back(atime.second);
+//    std::vector<int> sortingorder(timestosortby.size());
+//    std::iota(sortingorder.begin(), sortingorder.end(),0);
+//    std::sort(sortingorder.begin(),sortingorder.end(),
+//              [&timestosortby](size_t i1, size_t i2){return timestosortby[i1] < timestosortby[i2];});
+//    
+//    std::map<int,float> timescopyout;
+//    std::map<int,float> presmeartimescopyout;
+//    for(int indexi=0; indexi<sortingorder.size(); ++indexi){
+//      timescopyout.emplace(indexi,timescopy.at(sortingorder.at(indexi)));
+//      presmeartimescopyout.emplace(indexi,presmeartimescopy.at(sortingorder.at(indexi)));
+//    }
+//    G4cout<<"alt method sorted presmear times are: {";
+//    for(int i=0; i<presmeartimescopyout.size(); i++){
+//      G4cout<<presmeartimescopyout.at(i)<<", ";
+//    }
+////    G4cout<<"}, post-smear times are: {";
+////    for(int i=0; i<time.size(); i++){
+////      G4cout<<time.at(i)<<", ";
+////    }
+//    G4cout<<"}"<<G4endl;
   }
   
   void insertionSort(int a[], int array_size)

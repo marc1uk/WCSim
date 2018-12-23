@@ -19,7 +19,7 @@
 #include "WCSimTrackInformation.hh"
 
 const double SPEED_OF_LIGHT=299.792458; // mm/ns - match time and position units of G4SystemOfUnits
-const double REF_INDEX_WATER=1.32885;   // minimum value: gives longest possible time
+const double REF_INDEX_WATER=1.42535;   // maximum value: gives longest possible time
 
 void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
 {
@@ -121,15 +121,9 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
          processname += aStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
      }
    }
-//   if(processname=="FresnelReflection"){
-//     G4cerr<<"FresnelReflection between "
-//           <<aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName()
-//           << " and "
-//           <<aStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()
-//           <<G4endl;
-//   }
    
    static double totaltrackingtime=0;
+   static double absdist=0;
    static std::vector<double> steptimes;
    static std::vector<double> steplengths;
    static std::vector<double> stepspeeds;
@@ -140,6 +134,7 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
    double stepspacelength = aStep->GetStepLength();
    if ( track->GetCurrentStepNumber() == 1 ){
      totaltrackingtime=aStep->GetDeltaTime();
+     absdist=stepspacelength;
      steptimes.clear();
      steplengths.clear();
      stepspeeds.clear();
@@ -147,7 +142,7 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
      stepprocesses.clear();
      stepdirs.clear();
    }
-   else { totaltrackingtime += steptimelength; }
+   else { totaltrackingtime += steptimelength; absdist += stepspacelength; }
    
    steptimes.push_back(steptimelength);
    steplengths.push_back(stepspacelength);
@@ -189,55 +184,55 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
        double distx = aStep->GetPostStepPoint()->GetPosition().x();
        double disty = aStep->GetPostStepPoint()->GetPosition().y() - tankyoffset;
        double distz = aStep->GetPostStepPoint()->GetPosition().z() - tankzoffset;
-       double absdist = sqrt(pow(distx,2.)+pow(disty,2.)+pow(distz,2.));
+       //double absdist = sqrt(pow(distx,2.)+pow(disty,2.)+pow(distz,2.));
        
        double expectedsteptime = (stepspacelength*REF_INDEX_WATER/SPEED_OF_LIGHT);
        
-//       if(abs(steptimelength-expectedsteptime)>8){  // only look at steps where a significant delay is incurred
-//         G4cerr<<"!!!! LONG STEP IN "<<track->GetVolume()->GetName()<<": speed of light should be "
-//               <<(SPEED_OF_LIGHT/REF_INDEX_WATER)<<" vs measured speed "<<(stepspacelength/steptimelength)
-//               <<", step length = "<<stepspacelength
-//               <<", expected duration = "<<(stepspacelength*REF_INDEX_WATER/SPEED_OF_LIGHT)
-//               <<", measured duration = "<<steptimelength
-//               <<", PostProcessDefinedStep = "<<processname
-//               <<", PreProcessDefinedStep = "<<aStep->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName()
-//               <<", Material name "<<track->GetMaterial()->GetName()
-//               <<", MPT is at "<<aMaterialPropertiesTable<<" with RINDEX "<<Rindex
-//               <<" at photon momentum "<<thePhotonMomentum
-//               <<G4endl;
-//               track->SetTrackStatus(fStopAndKill);  // so that it doesn't get picked up repeatedly
-//               fExpectedNextStatus=Undefined;
-//               return;
-//       }
+       if(abs(steptimelength-expectedsteptime)>8){  // only look at steps where a significant delay is incurred
+         G4cerr<<"!!!! LONG STEP IN "<<track->GetVolume()->GetName()<<": speed of light should be "
+               <<(SPEED_OF_LIGHT/REF_INDEX_WATER)<<" vs measured speed "<<(stepspacelength/steptimelength)
+               <<", step length = "<<stepspacelength
+               <<", expected duration = "<<(stepspacelength*REF_INDEX_WATER/SPEED_OF_LIGHT)
+               <<", measured duration = "<<steptimelength
+               <<", PostProcessDefinedStep = "<<processname
+               <<", PreProcessDefinedStep = "<<aStep->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName()
+               <<", Material name "<<track->GetMaterial()->GetName()
+               <<", MPT is at "<<aMaterialPropertiesTable<<" with RINDEX "<<Rindex
+               <<" at photon momentum "<<thePhotonMomentum
+               <<G4endl;
+               track->SetTrackStatus(fStopAndKill);  // so that it doesn't get picked up repeatedly
+               fExpectedNextStatus=Undefined;
+               return;
+       }
        
-//       if(abs(totaltrackingtime-(absdist*REF_INDEX_WATER/SPEED_OF_LIGHT))>8){
-//         G4cerr<<"!!!! LONG TOTAL STEP "<<track->GetCurrentStepNumber()<<" IN "<<track->GetVolume()->GetName()
-//               <<": speed of light should be "<<(SPEED_OF_LIGHT/REF_INDEX_WATER)
-//               <<" vs measured speed "<<(absdist/totaltrackingtime)
-//               <<", total distance = "<<absdist<<" in measured time = "<<totaltrackingtime
-//               <<", expected time = "<<(absdist*REF_INDEX_WATER/SPEED_OF_LIGHT)
-//               <<", ProcessDefinedStep = "<<aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()
-//               <<", Current material name "<<track->GetMaterial()->GetName()
-//               <<", MPT is at "<<aMaterialPropertiesTable<<" with RINDEX "<<Rindex
-//               <<" at photon momentum "<<thePhotonMomentum
-//               <<G4endl
-//               <<"Steps were: ";
-//               for(int stepi=0; stepi<steptimes.size(); ++stepi){
-//                 G4cerr<<"{ Time: "<<steptimes.at(stepi)<<", Length: "<<steplengths.at(stepi)
-//                       <<", Speed: "<<stepspeeds.at(stepi)
-//                       <<", Volume: "<<stepvols.at(stepi)
-//                       <<", Process: "<<stepprocesses.at(stepi)
-//                       <<", Dir: ("
-//                       <<stepdirs.at(stepi).at(0)<<", "
-//                       <<stepdirs.at(stepi).at(1)<<", "
-//                       <<stepdirs.at(stepi).at(2)<<") "
-//                       "}, ";
-//               }
-//               G4cerr<<G4endl;
-//               track->SetTrackStatus(fStopAndKill);  // so that it doesn't get picked up repeatedly
-//               fExpectedNextStatus=Undefined;
-//               return;
-//       }
+       if(abs(totaltrackingtime-(absdist*REF_INDEX_WATER/SPEED_OF_LIGHT))>8){
+         G4cerr<<"!!!! LONG TOTAL STEP "<<track->GetCurrentStepNumber()<<" IN "<<track->GetVolume()->GetName()
+               <<": speed of light should be "<<(SPEED_OF_LIGHT/REF_INDEX_WATER)
+               <<" vs measured speed "<<(absdist/totaltrackingtime)
+               <<", total distance = "<<absdist<<" in measured time = "<<totaltrackingtime
+               <<", expected time = "<<(absdist*REF_INDEX_WATER/SPEED_OF_LIGHT)
+               <<", ProcessDefinedStep = "<<aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()
+               <<", Current material name "<<track->GetMaterial()->GetName()
+               <<", MPT is at "<<aMaterialPropertiesTable<<" with RINDEX "<<Rindex
+               <<" at photon momentum "<<thePhotonMomentum
+               <<G4endl
+               <<"Steps were: ";
+               for(int stepi=0; stepi<steptimes.size(); ++stepi){
+                 G4cerr<<"{ Time: "<<steptimes.at(stepi)<<", Length: "<<steplengths.at(stepi)
+                       <<", Speed: "<<stepspeeds.at(stepi)
+                       <<", Volume: "<<stepvols.at(stepi)
+                       <<", Process: "<<stepprocesses.at(stepi)
+                       <<", Dir: ("
+                       <<stepdirs.at(stepi).at(0)<<", "
+                       <<stepdirs.at(stepi).at(1)<<", "
+                       <<stepdirs.at(stepi).at(2)<<") "
+                       "}, ";
+               }
+               G4cerr<<G4endl;
+               track->SetTrackStatus(fStopAndKill);  // so that it doesn't get picked up repeatedly
+               fExpectedNextStatus=Undefined;
+               return;
+       }
      }
    }
    

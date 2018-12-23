@@ -127,6 +127,7 @@ class WCSimRootCherenkovHitTime : public TObject {
 private:
   // See jhfNtuple.h for the meaning of these data members:
   Float_t fTruetime;
+  Float_t fSmeartime;
   Int_t   fPrimaryParentID;
   long long int fNumScatterings;
   std::map<std::string,int> fScatterings;
@@ -135,6 +136,7 @@ private:
 public:
   WCSimRootCherenkovHitTime() {}
   WCSimRootCherenkovHitTime(Float_t truetime,
+                           Float_t smeartime,
                            Int_t   primaryParentID,
                            long long int numscatters,
                            std::map<std::string,int> processes);
@@ -142,6 +144,7 @@ public:
   virtual ~WCSimRootCherenkovHitTime() { }
 
   Float_t   GetTruetime() { return fTruetime;}
+  Float_t   GetSmeartime(){ return fSmeartime;}
   Int_t     GetParentID() { return fPrimaryParentID;}
   long long int GetNumScatterings() { return fNumScatterings;}
   std::map<std::string,int> GetScatterings() { return fScatterings;}
@@ -449,6 +452,7 @@ public:
 
   WCSimRootCherenkovHit   *AddCherenkovHit(Int_t                tubeID,
 					  std::vector<Float_t> truetime,
+					  std::vector<Float_t> smeartime,
                                           std::vector<Int_t>   primParID,
                                           std::vector<long long int> numscatters,
                                           std::vector<std::map<std::string,int> > processes
