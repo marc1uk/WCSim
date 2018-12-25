@@ -146,7 +146,7 @@ public:
   };
   inline std::map<int,float>::const_iterator GetTimeMapBegin() {return time.cbegin();}
   inline std::map<int,float>::const_iterator GetTimeMapEnd() {return time.cend();}
-  inline G4float GetPreSmearTime(int gate)   {if(time_presmear.at(gate)<0) G4cout<<"### NEGATE PRESMEAR TIME "<<time_presmear.at(gate)<<" IN GETPRESMEARTIME"<<G4endl;  return time_presmear.at(gate);};
+  inline G4float GetPreSmearTime(int gate) {return time_presmear.at(gate);}
   std::vector<int> GetDigiCompositionInfo(int gate);
   inline std::map< int, std::vector<int> > GetDigiCompositionInfo(){return fDigiComp;}
   inline G4int   GetStripNo(int gate){ return stripno[gate];};
@@ -239,7 +239,6 @@ public:
         time.at(j) = index_time;
         //G4cout<<"setting "<<j<<":"<<index_timepresmear;
         time_presmear.at(j) = index_timepresmear;
-        if(index_timepresmear<0) G4cout<<"#### NEGATIVE PRESMEAR TIME IN SORT"<<G4endl;
         pe.at(j) = index_pe;
         if(sort_digi_compositions) fDigiComp.at(j) = index_digicomp;
         primaryParentID.at(j) = index_primaryparentid;

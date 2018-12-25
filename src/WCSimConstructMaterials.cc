@@ -1010,7 +1010,7 @@ void WCSimDetectorConstruction::ConstructMaterials()
    // =====================================
    const G4int arrEntries = 2;
    G4double photEneSteel[] = { 1.56962*CLHEP::eV, 6.19998*CLHEP::eV };
-   G4double rIndexSteel[] = { 1.5, 1.5};
+   G4double rIndexSteel[] = { 1.35, 1.35};
    G4double absSteel[] = { 1.0e-9*CLHEP::cm,  1.0e-9*CLHEP::cm};
    G4double refSteel[] = {0.5, 0.5}; // low estimate.
    G4double specularlobeSteel[] = {0.8, 0.8};   // ¯\_(ツ)_/¯
@@ -1021,7 +1021,7 @@ void WCSimDetectorConstruction::ConstructMaterials()
    // see http://geant4.web.cern.ch/geant4/UserDocumentation/UsersGuides/ForApplicationDeveloper/html/ch05s02.html
    G4MaterialPropertiesTable *innerstructureMatProps = new G4MaterialPropertiesTable();
    innerstructureMatProps->AddProperty("RINDEX", photEneSteel, rIndexSteel, arrEntries);
-   innerstructureMatProps->AddProperty("ABSLENGTH",photEneSteel,absSteel,arrEntries);
+//   innerstructureMatProps->AddProperty("ABSLENGTH",photEneSteel,absSteel,arrEntries);
    // total probability of reflection
    innerstructureMatProps->AddProperty("REFLECTIVITY",photEneSteel, refSteel,arrEntries);
    // selection of type of reflection
@@ -1033,7 +1033,7 @@ void WCSimDetectorConstruction::ConstructMaterials()
    InnerStructureOpSurface->SetType(dielectric_metal);
    InnerStructureOpSurface->SetModel(unified);
    InnerStructureOpSurface->SetFinish(ground);
-   InnerStructureOpSurface->SetSigmaAlpha(0.1);
+   InnerStructureOpSurface->SetSigmaAlpha(0.3);
    InnerStructureOpSurface->SetMaterialPropertiesTable(innerstructureMatProps);
    
    // reflectivity of tank liner

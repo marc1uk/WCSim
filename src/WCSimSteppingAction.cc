@@ -79,14 +79,19 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
   
   if(track->GetDefinition()==G4OpticalPhoton::OpticalPhotonDefinition()){
   
-//   if(aStep->IsFirstStepInVolume()){  // FIXME: kill photon if no RINDEX. Should be automatic?!
+//   if(aStep->IsFirstStepInVolume()){ // reflections can have steps with StepTooSmall in material with no RINDEX
 //     G4MaterialPropertyVector* RindexVector=nullptr;
 //     G4MaterialPropertiesTable* aMaterialPropertiesTable = track->GetMaterial()->GetMaterialPropertiesTable();
 //     if(aMaterialPropertiesTable) RindexVector = aMaterialPropertiesTable->GetProperty("RINDEX");
 //     if(RindexVector==nullptr){
-//       track->SetTrackStatus(fStopAndKill);  // don't know why it's allowing photons to be transported
-//       fExpectedNextStatus=Undefined;        // in materials with no Rindex
-//       return;
+//       G4cout<<"Photon step in volume "<<aStep->GetPostStepPoint()->GetPhysicalVolume()->GetName()
+//             <<" which has no RINDEX? BoundaryStatus was:"
+//             <<( (aStep->GetPostStepPoint()->GetStepStatus()==fGeomBoundary) ? "boundary=" : "not boundary")
+//             <<( (aStep->GetPostStepPoint()->GetStepStatus()==fGeomBoundary) ? ToName(boundary->GetStatus()) : "")
+//             <<G4endl;
+//       //track->SetTrackStatus(fStopAndKill);  // not needed
+//       //fExpectedNextStatus=Undefined;        // 
+//       //return;
 //     }
 //   }
     
@@ -397,9 +402,20 @@ double WCSimSteppingAction::FieldLines(G4double /*x*/,G4double /*y*/,G4int /*coo
 }
 
 G4String WCSimSteppingAction::ToName(G4OpBoundaryProcessStatus boundaryStatus){
-  static std::vector<G4String> processnames{"Undefined","FresnelRefraction","FresnelReflection",
-  "TotalInternalReflection",  "LambertianReflection","LobeReflection","SpikeReflection",
-  "BackScattering","Absorption","Detection","NotAtBoundary","SameMaterial","StepTooSmall","NoRINDEX"};
+  // convert from names in $G4/src/source/processes/optical/include/G4OpBoundaryProcess.hh
+static std::vector<G4String> processnames {"Undefined","Transmission","FresnelRefraction",
+  "FresnelReflection","TotalInternalReflection","LambertianReflection",
+  "LobeReflection","SpikeReflection","BackScattering","Absorption",
+  "Detection","NotAtBoundary","SameMaterial","StepTooSmall","NoRINDEX",
+  "PolishedLumirrorAirReflection","PolishedLumirrorGlueReflection",
+  "PolishedAirReflection","PolishedTeflonAirReflection","PolishedTiOAirReflection",
+  "PolishedTyvekAirReflection","PolishedVM2000AirReflection","PolishedVM2000GlueReflection",
+  "EtchedLumirrorAirReflection","EtchedLumirrorGlueReflection","EtchedAirReflection",
+  "EtchedTeflonAirReflection","EtchedTiOAirReflection","EtchedTyvekAirReflection",
+  "EtchedVM2000AirReflection","EtchedVM2000GlueReflection","GroundLumirrorAirReflection",
+  "GroundLumirrorGlueReflection","GroundAirReflection","GroundTeflonAirReflection",
+  "GroundTiOAirReflection","GroundTyvekAirReflection","GroundVM2000AirReflection",
+  "GroundVM2000GlueReflection","Dichroic"};
   if(boundaryStatus<processnames.size()) return processnames.at(boundaryStatus);
   else return std::to_string(boundaryStatus);
 }
