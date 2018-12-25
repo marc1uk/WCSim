@@ -96,7 +96,7 @@ public:
   inline void AddGate(int g,float t) { Gates.insert(g); TriggerTimes.push_back(t);}
   inline void SetPe(G4int gate,  G4float Q)      {pe[gate]     = Q;};
   inline void SetTime(G4int gate, G4float T)    {time[gate]   = T;};
-  inline void SetPreSmearTime(G4int gate, G4float T)    {time_presmear[gate]   = T; if(T<0) G4cout<<"###### SetPreSmearTime with negative time "<<T<<G4endl;};
+  inline void SetPreSmearTime(G4int gate, G4float T)    {time_presmear[gate]   = T;};
   inline void SetParentID(G4int gate, G4int parent) { primaryParentID[gate] = parent; };
   inline void SetNumScatters(G4int gate, long long int numscatters) { fNumScatterings[gate] = numscatters; };
   inline void SetScatterings(G4int gate, std::map<std::string,int> scats) {fScatterings[gate] = scats; };
@@ -146,7 +146,7 @@ public:
   };
   inline std::map<int,float>::const_iterator GetTimeMapBegin() {return time.cbegin();}
   inline std::map<int,float>::const_iterator GetTimeMapEnd() {return time.cend();}
-  inline G4float GetPreSmearTime(int gate) {return time_presmear.at(gate);}
+  inline G4float GetPreSmearTime(int gate)   {return time_presmear.at(gate);};
   std::vector<int> GetDigiCompositionInfo(int gate);
   inline std::map< int, std::vector<int> > GetDigiCompositionInfo(){return fDigiComp;}
   inline G4int   GetStripNo(int gate){ return stripno[gate];};
