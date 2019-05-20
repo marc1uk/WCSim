@@ -321,7 +321,7 @@ void WCSimRootTrigger::Print(int verbosity, int maxprimariestoprint, int maxtrac
   // loop over primary vertices. Usually just 1. Delayed triggers may report 0, so coerce to 1. 
   for(int primaryi=0; primaryi<std::max(1,std::min(maxprimariestoprint,fNvtxs)); primaryi++){
     std::cout<<"Primary vertex "<<primaryi<<" was at ("
-        <<fVtxs[primaryi][0]<<", "<<fVtxs[primaryi][2]<<", "<<fVtxs[primaryi][2]<<")"<<std::endl;
+        <<fVtxs[primaryi][0]<<", "<<fVtxs[primaryi][1]<<", "<<fVtxs[primaryi][2]<<")"<<std::endl;
   }
   
   //int numphotons = firsttrig->GetCherenkovHits()->GetEntries();  //<< applicable to entire event, not trigger

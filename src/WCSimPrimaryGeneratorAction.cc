@@ -853,13 +853,30 @@ void WCSimPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
       double tote = anEvent->GetPrimaryVertex()->GetPrimary()->GetTotalEnergy();
       double ke = anEvent->GetPrimaryVertex()->GetPrimary()->GetKineticEnergy();
       
-      G4ParticleDefinition* parttype = particleTable->FindParticle(pdg);
-      G4String particlename;
-      particlename = (parttype!=0) ? (std::string(parttype->GetParticleName())) : (std::to_string(pdg));
-      G4cout<<"Generating primary "<<particlename<<" with total energy "
-            <<tote/MeV<<"MeV and kinetic energy "<<ke/MeV
-            <<"MeV at ("<<vtx.x()<<", "<<vtx.y()<<", "<<vtx.z()<<") in direction ("
-            <<dir.x()<<", "<<dir.y()<<", "<<dir.z()<<") "<<G4endl;
+      int nprimaryvertices = anEvent->GetNumberOfPrimaryVertex();
+      G4cout<<"Generating event with "<<nprimaryvertices<<" primary vertices"<<G4endl;
+      for(int evtvtxi=0; evtvtxi<nprimaryvertices; evtvtxi++){
+        G4PrimaryVertex* thevertex = anEvent->GetPrimaryVertex(evtvtxi);
+        int nparticles = thevertex->GetNumberOfParticle();
+        G4cout<<"Primary vertex "<<evtvtxi<<" has "<<nparticles<<" particles"<<G4endl;
+        vtx  = thevertex->GetPosition();
+        
+        for(int parti=0; parti<nparticles; parti++){
+          G4PrimaryParticle* theprimary = thevertex->GetPrimary(parti);
+          pdg  = theprimary->GetPDGcode();
+          tote = theprimary->GetTotalEnergy();
+          ke   = theprimary->GetKineticEnergy();
+          dir  = theprimary->GetMomentum().unit();
+          
+          G4ParticleDefinition* parttype = particleTable->FindParticle(pdg);
+          G4String particlename;
+          particlename = (parttype!=0) ? (std::string(parttype->GetParticleName())) : (std::to_string(pdg));
+          G4cout<<"Generating primary "<<particlename<<" with total energy "
+                <<tote/MeV<<"MeV and kinetic energy "<<ke/MeV
+                <<"MeV at ("<<vtx.x()<<", "<<vtx.y()<<", "<<vtx.z()<<") in direction ("
+                <<dir.x()<<", "<<dir.y()<<", "<<dir.z()<<") "<<G4endl;
+        }
+      }
     }
 }
 

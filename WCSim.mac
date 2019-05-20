@@ -212,6 +212,23 @@
 #/gun/direction 0 0 1
 #/gun/position 50 50 -500 mm
 
+## Simulating CC1Pi events
+###################################################
+# Use a muon gun for testing scintillator elements
+/mygen/generator gps
+/gps/source/intensity 1
+/gps/particle mu-
+/gps/energy 500 MeV
+/gps/direction 0 0 1
+/gps/pos/centre 0 -14.46 168.1 cm
+/gps/source/add 1
+/gps/particle pi+
+/gps/energy 200 MeV
+/gps/ang/type iso
+/gps/pos/centre 0 -14.46 168.1 cm
+# generate both particles in every event; don't randomly choose
+/gps/source/multiplevertex true
+
 ## Isotropic electron swarm within tank for Bonsai training
 ############################################################
 # use laser for bonsai 

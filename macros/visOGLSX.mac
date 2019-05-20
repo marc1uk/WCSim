@@ -21,7 +21,7 @@
 /vis/viewer/set/hiddenMarker 0
 #/vis/viewer/set/viewpointThetaPhi 112.5 0 #0.4
 #/vis/viewer/set/auxiliaryEdge 0
-#/vis/viewer/set/background white 0 # red green blue opacity << opacity has no effect?
+/vis/viewer/set/background white 0 # red green blue opacity << opacity has no effect?
 #/vis/viewer/set/rotationStyle freeRotation #constrainUpDirection or 
 #/vis/viewer/set/style s # (for solid) or w for wireframe
 #/vis/viewer/set/targetPoint 0 0 10 m
@@ -29,10 +29,13 @@
 #/vis/viewer/dolly 1 m #Moves the camera incrementally towards target point
 #/vis/viewer/dollyTo 1 m #Places the camera towards target point relative to standard camera point.
 
+/vis/geometry/set/colour expHall_log 1  0.5 0.5 0.5 0
+
 /vis/geometry/set/visibility cad_logical -1 1
 /vis/geometry/set/forceSolid cad_logical -1 1
 /vis/geometry/set/colour cad_logical -1 0.5 0.5 0.5 1
 
+/vis/geometry/set/colour WC 1 0.5 0.5 0.5 0.2
 /vis/geometry/set/visibility WCBarrel 1 1   ## barrel contents - use just WC for whole tank
 /vis/geometry/set/forceSolid WCBarrel 1 1   ## this works for the steel though
 /vis/geometry/set/colour WCBarrel 1 1. 1. 1. 0.2
@@ -65,21 +68,74 @@
 /vis/geometry/set/colour ANNIEp2v6-glassFaceWCONLYLAPPDS -1 0.6 0.6 0.6 1
 /vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_EMI9954KB -1 1.0 0.3 .3 1
 
-# MRD
+## MRD
 #/vis/geometry/set/forceSolid hpaddle_log -1 1
 #/vis/geometry/set/forceSolid vpaddle_log -1 1
 #/vis/geometry/set/forceSolid vpaddle_log2 -1 1
 #/vis/geometry/set/forceSolid steel_log -1 1
-#/vis/geometry/set/forceSolid aluStruct -1 1
+##/vis/geometry/set/forceSolid aluStruct -1 1
 #/vis/geometry/set/colour hpaddle_log -1 0.5 0.3 0.7 0.5
 #/vis/geometry/set/colour vpaddle_log -1 1.0 0.5 0.5 0.5
-#/vis/geometry/set/colour vpaddle_log2 -1 0.3 0.7 0.5 0.5
+#/vis/geometry/set/colour vpaddle_log2 -1 1.0 0.5 0.5 0.5
 #/vis/geometry/set/colour taper_log -1 0.3 0.3 0.3 0.4
-#/vis/geometry/set/colour lg_log -1 0.6 0.6 0.3 0.4
-#/vis/geometry/set/colour lg_log2 -1 0.8 0.6 0.4 0.4
+#/vis/geometry/set/colour lg_log -1 0.6 0.4 0.4 0.4
+#/vis/geometry/set/colour lg_log2 -1 0.6 0.4 0.4 0.4
 #/vis/geometry/set/colour steel_log -1 0.3 0.3 0.3 0.4
-#/vis/geometry/set/colour aluStruct -1 0.7 0.7 0.7 0.4
+##/vis/geometry/set/colour aluStruct -1 0.7 0.7 0.7 0.4
 #/vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_MRD -1 0.7 0.7 0.7 0.3
+#/vis/geometry/set/forceSolid MRDAlV1_LV -1 1
+#/vis/geometry/set/forceSolid MRDAlV2_LV -1 1
+#/vis/geometry/set/forceSolid MRDAlV3_LV -1 1
+#/vis/geometry/set/forceSolid MRDAlV4_LV -1 1
+#/vis/geometry/set/forceSolid MRDAlV5_LV -1 1
+#/vis/geometry/set/forceSolid MRDAlH1_LV -1 1
+#/vis/geometry/set/forceSolid MRDAlH2_LV -1 1
+#/vis/geometry/set/forceSolid MRDAlH3_LV -1 1
+## FACC
+#/vis/geometry/set/forceSolid vetoPaddle_log -1 1
+#/vis/geometry/set/forceSolid vetol2Paddle_log -1 1
+#/vis/geometry/set/forceSolid vetolg_log -1 1
+#/vis/geometry/set/colour vetoPaddle_log -1 0.5 0.7 0.7 0.5
+#/vis/geometry/set/colour vetol2Paddle_log  -1 0.6 0.4 0.4 0.4
+#/vis/geometry/set/colour vetolg_log -1 0.6 0.4 0.4 0.4
+
+## white only looks cleaner
+# MRD
+/vis/geometry/set/forceSolid hpaddle_log -1 1
+/vis/geometry/set/forceSolid vpaddle_log -1 1
+/vis/geometry/set/forceSolid vpaddle_log2 -1 1
+/vis/geometry/set/forceSolid steel_log -1 1
+#/vis/geometry/set/forceSolid aluStruct -1 1
+/vis/geometry/set/colour hpaddle_log -1 0.5 0.5 0.5 0.5
+/vis/geometry/set/colour vpaddle_log -1 0.5 0.5 0.5 0.5
+/vis/geometry/set/colour vpaddle_log2 -1 0.5 0.5 0.5 0.5
+/vis/geometry/set/colour taper_log -1 0.5 0.5 0.5 0.4
+/vis/geometry/set/colour lg_log -1 0.5 0.5 0.5 0.4
+/vis/geometry/set/colour lg_log2 -1 0.5 0.5 0.5 0.4
+/vis/geometry/set/colour steel_log -1 0.5 0.5 0.5 1.0
+/vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_MRD -1 0.5 0.5 0.5 0.3
+/vis/geometry/set/forceSolid MRDAlV1_LV -1 1
+/vis/geometry/set/forceSolid MRDAlV2_LV -1 1
+/vis/geometry/set/forceSolid MRDAlV3_LV -1 1
+/vis/geometry/set/forceSolid MRDAlV4_LV -1 1
+/vis/geometry/set/forceSolid MRDAlV5_LV -1 1
+/vis/geometry/set/forceSolid MRDAlH1_LV -1 1
+/vis/geometry/set/forceSolid MRDAlH2_LV -1 1
+/vis/geometry/set/forceSolid MRDAlH3_LV -1 1
+# FACC
+/vis/geometry/set/forceSolid vetoPaddle_log -1 1
+/vis/geometry/set/forceSolid vetol2Paddle_log -1 1
+/vis/geometry/set/forceSolid vetolg_log -1 1
+/vis/geometry/set/colour vetoPaddle_log -1 0.5 0.5 0.5 0.5
+/vis/geometry/set/colour vetol2Paddle_log  -1 0.5 0.5 0.5 0.4
+/vis/geometry/set/colour vetolg_log -1 0.5 0.5 0.5 0.4
+/vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_FACC -1 0.5 0.5 0.5 0.3
+
+#/vis/viewer/flush
+#/vis/ogl/set/printMode pixmap
+#/vis/ogl/set/printSize 4000 4000
+#/vis/viewer/set/culling global
+#convert -density 400 G4OpenGL_viewer-1_0.eps G4OpenGL_viewer-1_0.pdf
 
 ## make things invisible
 #/vis/geometry/set/visibility WC -1 0             # entire tank
@@ -125,15 +181,15 @@
 /vis/scene/add/trajectories
 #/vis/scene/endOfEventAction accumulate
 
-#/vis/scene/add/axes 0 0 0 5 m
-/vis/scene/add/scale 2 m x 1 0 0 manual 1 0 0 m
-/vis/scene/add/scale 2 m y 0 1 0 manual 0 1 0 m 
-/vis/scene/add/scale 2 m z 0 0 1 manual 0 0 1 m
-#/vis/viewer/set/defaultTextColour 1 1 1	should be default, can give argument "white", use ! to unchange values but set further parameters
-/vis/scene/add/text 1 -0.2 0 m 16 0 0 x		# red
-/vis/scene/add/text 0 0.8 -0.1 m 16 0 0 y	# green
-/vis/scene/add/text 0 -0.2 1 m 16 0 0 z		# blue
-#text [x] [y] [z] [unit] [font_size] [x_offset] [y_offset] [text]
+##/vis/scene/add/axes 0 0 0 5 m
+#/vis/scene/add/scale 2 m x 1 0 0 manual 1 0 0 m
+#/vis/scene/add/scale 2 m y 0 1 0 manual 0 1 0 m 
+#/vis/scene/add/scale 2 m z 0 0 1 manual 0 0 1 m
+##/vis/viewer/set/defaultTextColour 1 1 1	should be default, can give argument "white", use ! to unchange values but set further parameters
+#/vis/scene/add/text 1 -0.2 0 m 16 0 0 x		# red
+#/vis/scene/add/text 0 0.8 -0.1 m 16 0 0 y	# green
+#/vis/scene/add/text 0 -0.2 1 m 16 0 0 z		# blue
+##text [x] [y] [z] [unit] [font_size] [x_offset] [y_offset] [text]
 #/vis/scene/add/hits
 #/vis/scene/add/trajectories smooth
 #/vis/filtering/trajectories/create/attributeFilter PDG

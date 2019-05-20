@@ -100,14 +100,6 @@ public:
   // get legacy digit time offset, for accounting in EndOfEventAction
   float GetWCTriggerOffset(){return offset;}
   
-protected:
-
-  ///This should call the trigger algorithms, and handle any temporary DigitsCollection's
-  virtual void DoTheWork(WCSimWCDigitsCollection* WCDCPMT) = 0;
-
-  /// Get the default threshold, etc. from the derived class, and override with read from the .mac file
-  void GetVariables();
-
   ///Set the default trigger class specific decision of whether to save multiple digits per PMT per trigger (overridden by .mac)
   virtual bool GetDefaultMultiDigitsPerTrigger()   { return true; }
   ///Set the default trigger class specific NDigits window (in ns) (overridden by .mac)
@@ -130,6 +122,14 @@ protected:
   int GetPreTriggerWindow(TriggerType_t t);
   ///Get the posttrigger window for a given trigger algorithm
   int GetPostTriggerWindow(TriggerType_t t);
+  
+protected:
+
+  ///This should call the trigger algorithms, and handle any temporary DigitsCollection's
+  virtual void DoTheWork(WCSimWCDigitsCollection* WCDCPMT) = 0;
+
+  /// Get the default threshold, etc. from the derived class, and override with read from the .mac file
+  void GetVariables();
 
   //these are the algorithms that perform triggering
   //they are stored here so that different trigger classes can use the same algorithms without copying code
