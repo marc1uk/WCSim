@@ -410,6 +410,7 @@ private:
   G4double WCLAPPDExposeHeight;
   G4double WCBarrelLAPPDOffset;
   G4double WCIDDiameter;
+  G4double WCLAPPDSliderThickness;
 
   G4double WCCapLength;
   G4double WCBackODLength;

@@ -194,7 +194,7 @@ private:
   Int_t   fGenieEntryNum;
 
 public:
-  WCSimRootEventHeader() : fEvtNum(0), fRun(0), fDate(0), fSubEvtNumber(1) { }
+  WCSimRootEventHeader() : fEvtNum(0), fRun(0), fDate(0), fSubEvtNumber(1), fDirtFileName(""), fGenieFileName(""), fDirtEntryNum(-1), fGenieEntryNum(-1){ }
    virtual ~WCSimRootEventHeader() { }
   void   Set(Int_t i, Int_t r, Int_t d, Int_t s=1) { fEvtNum = i; fRun = r; fDate = d; fSubEvtNumber = s;}
   void   SetDate(Int_t d) { fDate=d; }

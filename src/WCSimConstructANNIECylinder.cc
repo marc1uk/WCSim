@@ -303,8 +303,8 @@ G4LogicalVolume* WCSimDetectorConstruction::ConstructANNIECylinder()
 		
 		// position LAPPD on corner of the inner strucutre
 		// Note PMTs use double facei=0.5, using int facei=0 accounts for the relative rotation
-		G4double CellCentreX = WCIDRadius * sin(dPhi*facei);
-		G4double CellCentreY = WCIDRadius * cos(dPhi*facei);
+		G4double CellCentreX = (WCIDRadius - WCLAPPDSliderThickness) * sin(dPhi*facei);
+		G4double CellCentreY = (WCIDRadius - WCLAPPDSliderThickness) * cos(dPhi*facei);
 		
 		double verticalSpacingLAPPD	= mainAnnulusHeight/(WCLAPPDperCellVertical+1);
 		
