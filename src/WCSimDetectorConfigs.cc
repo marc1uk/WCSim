@@ -846,7 +846,7 @@ void WCSimDetectorConstruction::SetANNIEPhase2Geometryv6()
   
   // LAPPDs at octagon corners
   WCLAPPDperCellHorizontal= 1;				// 1 LAPPD on each octagon face (corner)
-  WCLAPPDperCellVertical  = 3;				// 3 rings of LAPPDs
+  WCLAPPDperCellVertical  = 1;				// 1 ring of veeeery loooooong LAPPDs (modified WCSimConstructLAPPD.cc)
   WCLAPPDSliderThickness  = 20*cm;			// offset of the LAPPD from inner structure corner
   
 }

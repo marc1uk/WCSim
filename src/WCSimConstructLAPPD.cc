@@ -58,6 +58,7 @@ else
   glassThickness = LAPPD->GetLAPPDGlassThickness();
 
   G4double sphereRadius = radius; //radius is actually half length in x,y
+  G4double extrudedRadius = 120.*cm;  // an artificially looong LAPPD vertically, for use with a masking system in analysis
   //(expose*expose+ radius*radius)/(2*expose);
   G4double LAPPDOffset = 0.;//expose-glassThickness/2.; //centre of glass position coordinates
 
@@ -66,7 +67,7 @@ else
   
   G4Box* solidWCLAPPD = 
    new G4Box("WCLAPPD",                    
-	     sphereRadius+0.015*m, //half length in x ~10.3 cm //0.5cm is the sidewall border and the glass exceeds by ~1cm. 
+	     extrudedRadius+0.015*m, //half length in x ~10.3 cm //0.5cm is the sidewall border and the glass exceeds by ~1cm. 
 	     sphereRadius+0.015*m, //half length in y ~ 10.3cm
 	     expose+0.005*m //half length in z
 	     ); //
@@ -99,7 +100,7 @@ else{
 //LAPPD active area
   G4Box* tmpSolidInteriorWCLAPPD = 
    new G4Box("tmpInteriorWCLAPPD",                    
-	     sphereRadius,              //half length in x ~ 10.15cm
+	     extrudedRadius,              //half length in x ~ 10.15cm
 	     sphereRadius,              //half length in y ~ 10.15cm
 	     (expose-glassThickness) //half length in z
 	     );//
@@ -144,14 +145,14 @@ else {
 //we ned that to substract the LAPPD active area to get the glass volume
 //G4Box* solidCutOffTubs2 =
 //   new G4Box(    "cutOffLAPPDsglass",
-//                 sphereRadius,
+//                 extrudedRadius,
 //                 sphereRadius,
 //                 expose);//-glassThickness));
 
 //Create LAPPD Glass Face
  G4Box* tmpGlassFaceWCLAPPD = 
    new G4Box("tmpGlassFaceWCLAPPD",                    
-	     (sphereRadius + 0.0085*m), //half length in x
+	     (extrudedRadius + 0.0085*m), //half length in x
 	     (sphereRadius + 0.013*m), //half length in y
 	     (expose)//+glassThickness)       //half length in z
 	     );//
