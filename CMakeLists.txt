@@ -206,6 +206,8 @@ set(WCSIM_SCRIPTS
   dirtdirectory.txt
   WCSimVersion.txt
   CommitHash.txt
+  PMTPositions_Scan_Glass.txt
+  PMTPositions_Scan.txt
   )
 
 foreach(_script ${WCSIM_SCRIPTS})
@@ -214,6 +216,21 @@ foreach(_script ${WCSIM_SCRIPTS})
     ${PROJECT_BINARY_DIR}/${_script}
     COPYONLY
     )
+endforeach()
+
+set(MRD_SCRIPTS
+   mrdmodule.txt
+   mrdposition.txt
+   mrd-align.txt
+   mrdnoisehit.txt
+   )
+
+foreach(_script ${MRD_SCRIPTS})
+  configure_file(
+    ${PROJECT_SOURCE_DIR}/src/${_script}
+    ${PROJECT_BINARY_DIR}/${_script}
+    COPYONLY
+  )
 endforeach()
 
 # dunno why but on sl7 we seem to need to copy these manually?

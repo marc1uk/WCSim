@@ -17,10 +17,10 @@ SBsimMRDDB::SBsimMRDDB()
 ////////////////////////
 {
   //SetModuleInfo((char*)"database/mrdgeom/mrdmodule.txt");
-  SetModuleInfo((char*)"../WCSim/src/mrdmodule.txt");
-  SetPositionInfo((char*)"../WCSim/src/mrdposition.txt");
-  SetAlignmentInfo("../WCSim/src/mrd-align.txt");
-  SetNoiseHitInfo((char*)"../WCSim/src/mrdnoisehit.txt");
+  SetModuleInfo((char*)"mrdmodule.txt");
+  SetPositionInfo((char*)"mrdposition.txt");
+  SetAlignmentInfo("mrd-align.txt");
+  SetNoiseHitInfo((char*)"mrdnoisehit.txt");
 }
 
 /////////////////////////

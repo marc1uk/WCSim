@@ -53,24 +53,24 @@
 /vis/geometry/set/colour WCCapBlackSheet -1 0.5 0.5 0.5 0.3
 
 # PMT colours
-/vis/geometry/set/visibility ANNIEp2v6-glassFaceWCPMT_R7081 -1 1
-/vis/geometry/set/visibility ANNIEp2v6-glassFaceWCPMT_D784KFLB -1 1
-/vis/geometry/set/visibility ANNIEp2v6-glassFaceWCPMT_R5912HQE -1 1
-/vis/geometry/set/visibility ANNIEp2v6-glassFaceWCPMT_R7081HQE -1 1
-/vis/geometry/set/visibility ANNIEp2v6-glassFaceWCONLYLAPPDS -1 1
-/vis/geometry/set/visibility ANNIEp2v6-glassFaceWCPMT_EMI9954KB -1 1
-/vis/geometry/set/forceSolid ANNIEp2v6-glassFaceWCPMT_R7081 -1 1
-/vis/geometry/set/forceSolid ANNIEp2v6-glassFaceWCPMT_D784KFLB -1 1
-/vis/geometry/set/forceSolid ANNIEp2v6-glassFaceWCPMT_R5912HQE -1 1
-/vis/geometry/set/forceSolid ANNIEp2v6-glassFaceWCPMT_R7081HQE -1 1
-/vis/geometry/set/forceSolid ANNIEp2v6-glassFaceWCONLYLAPPDS -1 1
-/vis/geometry/set/forceSolid ANNIEp2v6-glassFaceWCPMT_EMI9954KB -1 1
-/vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_R7081 -1 1. .6 1. 1
-/vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_D784KFLB -1 .6 1. 1. 1
-/vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_R5912HQE -1 .6 .6 1. 1
-/vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_R7081HQE -1 1.0 0.3 .3 1
-/vis/geometry/set/colour ANNIEp2v6-glassFaceWCONLYLAPPDS -1 0.6 0.8 0.5 1
-/vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_EMI9954KB -1 1.0 0.3 .3 1
+/vis/geometry/set/visibility ANNIEp2v7-glassFaceWCPMT_R7081 -1 1
+/vis/geometry/set/visibility ANNIEp2v7-glassFaceWCPMT_D784KFLB -1 1
+/vis/geometry/set/visibility ANNIEp2v7-glassFaceWCPMT_R5912HQE -1 1
+/vis/geometry/set/visibility ANNIEp2v7-glassFaceWCPMT_R7081HQE -1 1
+/vis/geometry/set/visibility ANNIEp2v7-glassFaceWCONLYLAPPDS -1 1
+/vis/geometry/set/visibility ANNIEp2v7-glassFaceWCPMT_EMI9954KB -1 1
+/vis/geometry/set/forceSolid ANNIEp2v7-glassFaceWCPMT_R7081 -1 1
+/vis/geometry/set/forceSolid ANNIEp2v7-glassFaceWCPMT_D784KFLB -1 1
+/vis/geometry/set/forceSolid ANNIEp2v7-glassFaceWCPMT_R5912HQE -1 1
+/vis/geometry/set/forceSolid ANNIEp2v7-glassFaceWCPMT_R7081HQE -1 1
+/vis/geometry/set/forceSolid ANNIEp2v7-glassFaceWCONLYLAPPDS -1 1
+/vis/geometry/set/forceSolid ANNIEp2v7-glassFaceWCPMT_EMI9954KB -1 1
+/vis/geometry/set/colour ANNIEp2v7-glassFaceWCPMT_R7081 -1 1. .6 1. 1
+/vis/geometry/set/colour ANNIEp2v7-glassFaceWCPMT_D784KFLB -1 .6 1. 1. 1
+/vis/geometry/set/colour ANNIEp2v7-glassFaceWCPMT_R5912HQE -1 .6 .6 1. 1
+/vis/geometry/set/colour ANNIEp2v7-glassFaceWCPMT_R7081HQE -1 1.0 0.3 .3 1
+/vis/geometry/set/colour ANNIEp2v7-glassFaceWCONLYLAPPDS -1 0.6 0.8 0.5 1
+/vis/geometry/set/colour ANNIEp2v7-glassFaceWCPMT_EMI9954KB -1 1.0 0.3 .3 1
 
 ## MRD
 #/vis/geometry/set/forceSolid hpaddle_log -1 1
@@ -86,7 +86,7 @@
 #/vis/geometry/set/colour lg_log2 -1 0.6 0.4 0.4 0.4
 #/vis/geometry/set/colour steel_log -1 0.3 0.3 0.3 0.4
 ##/vis/geometry/set/colour aluStruct -1 0.7 0.7 0.7 0.4
-#/vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_MRD -1 0.7 0.7 0.7 0.3
+#/vis/geometry/set/colour ANNIEp2v7-glassFaceWCPMT_MRD -1 0.7 0.7 0.7 0.3
 #/vis/geometry/set/forceSolid MRDAlV1_LV -1 1
 #/vis/geometry/set/forceSolid MRDAlV2_LV -1 1
 #/vis/geometry/set/forceSolid MRDAlV3_LV -1 1
@@ -117,7 +117,7 @@
 /vis/geometry/set/colour lg_log -1 0.5 0.5 0.5 0.4
 /vis/geometry/set/colour lg_log2 -1 0.5 0.5 0.5 0.4
 /vis/geometry/set/colour steel_log -1 0.5 0.5 0.5 1.0
-/vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_MRD -1 0.5 0.5 0.5 0.3
+/vis/geometry/set/colour ANNIEp2v7-glassFaceWCPMT_MRD -1 0.5 0.5 0.5 0.3
 /vis/geometry/set/forceSolid MRDAlV1_LV -1 1
 /vis/geometry/set/forceSolid MRDAlV2_LV -1 1
 /vis/geometry/set/forceSolid MRDAlV3_LV -1 1
@@ -133,7 +133,7 @@
 /vis/geometry/set/colour vetoPaddle_log -1 0.5 0.5 0.5 0.5
 /vis/geometry/set/colour vetol2Paddle_log  -1 0.5 0.5 0.5 0.4
 /vis/geometry/set/colour vetolg_log -1 0.5 0.5 0.5 0.4
-/vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_FACC -1 0.5 0.5 0.5 0.3
+/vis/geometry/set/colour ANNIEp2v7-glassFaceWCPMT_FACC -1 0.5 0.5 0.5 0.3
 
 #/vis/viewer/flush
 #/vis/ogl/set/printMode pixmap
@@ -150,18 +150,18 @@
 #/vis/geometry/set/visibility taper_log -1 0
 #/vis/geometry/set/colour totVetolog -1 0 0 0 0
 #/vis/geometry/set/colour totVetolog -1 1 1 1 0.5  # outline, for orientation
-#/vis/geometry/set/colour ANNIEp2v6-glassFaceWCONLYLAPPDS -1 0 0 0 0
-#/vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_R7081 -1 0 0 0 0
-#/vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_D784KFLB -1  0 0 0 0
-#/vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_R5912HQE -1  0 0 0 0
-#/vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_R7081HQE -1  0 0 0 0
-#/vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_EMI9954KB -1  0 0 0 0
-#/vis/geometry/set/visibility ANNIEp2v6-glassFaceWCPMT_R7081 -1 0
-#/vis/geometry/set/visibility ANNIEp2v6-glassFaceWCPMT_D784KFLB -1 0
-#/vis/geometry/set/visibility ANNIEp2v6-glassFaceWCPMT_R5912HQE -1 0
-#/vis/geometry/set/visibility ANNIEp2v6-glassFaceWCPMT_R7081HQE -1 0
-#/vis/geometry/set/visibility ANNIEp2v6-glassFaceWCONLYLAPPDS -1 0
-#/vis/geometry/set/colour ANNIEp2v6-glassFaceWCPMT_EMI9954KB -1  0 0 0 0
+#/vis/geometry/set/colour ANNIEp2v7-glassFaceWCONLYLAPPDS -1 0 0 0 0
+#/vis/geometry/set/colour ANNIEp2v7-glassFaceWCPMT_R7081 -1 0 0 0 0
+#/vis/geometry/set/colour ANNIEp2v7-glassFaceWCPMT_D784KFLB -1  0 0 0 0
+#/vis/geometry/set/colour ANNIEp2v7-glassFaceWCPMT_R5912HQE -1  0 0 0 0
+#/vis/geometry/set/colour ANNIEp2v7-glassFaceWCPMT_R7081HQE -1  0 0 0 0
+#/vis/geometry/set/colour ANNIEp2v7-glassFaceWCPMT_EMI9954KB -1  0 0 0 0
+#/vis/geometry/set/visibility ANNIEp2v7-glassFaceWCPMT_R7081 -1 0
+#/vis/geometry/set/visibility ANNIEp2v7-glassFaceWCPMT_D784KFLB -1 0
+#/vis/geometry/set/visibility ANNIEp2v7-glassFaceWCPMT_R5912HQE -1 0
+#/vis/geometry/set/visibility ANNIEp2v7-glassFaceWCPMT_R7081HQE -1 0
+#/vis/geometry/set/visibility ANNIEp2v7-glassFaceWCONLYLAPPDS -1 0
+#/vis/geometry/set/colour ANNIEp2v7-glassFaceWCPMT_EMI9954KB -1  0 0 0 0
 
 # colours for the MRD paddles. Not very effective unless really zoomed in.
 #/vis/geometry/set/visibility hpaddle_log  -1 1
